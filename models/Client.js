@@ -1,14 +1,12 @@
 const mongoose = require('mongoose');
+const AddressSchema = require('./shema/AddressSchema');
 
 const ClientSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-
     },
-    address: {
-
-    },
+    address: AddressSchema,
     points: {
         type: Number,
         default: 0
@@ -17,8 +15,9 @@ const ClientSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'request'
     }],
-    contactInfo: {
-        
+    phone: {
+        type: String,
+        required: true
     },
     email: {
         type: String,
@@ -36,6 +35,5 @@ const ClientSchema = new mongoose.Schema({
         default: -1 // No rating
     }
 });
-
 
 module.exports = mongoose.model('client', ClientSchema);

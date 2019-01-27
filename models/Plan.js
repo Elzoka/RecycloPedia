@@ -1,7 +1,12 @@
 const mongoose = require('mongoose');
+const categories = require('./config/categories.json');
+
 
 const PlanSchema = new mongoose.Schema({
-    category: String,
+    category: {
+        type: String,
+        enum: categories
+    },
     points: {
         type: Number,
         required: true
@@ -10,10 +15,11 @@ const PlanSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'request'
     }],
-    item: {
-        // itemSchema
+    itemName: {
+        type: String,
+        required: true
     },
     description: String
 });
 
-module.exports('plan', PlanSchema)
+module.exports = mongoose.model('plan', PlanSchema);

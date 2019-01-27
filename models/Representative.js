@@ -4,7 +4,6 @@ const RepresentativeSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-
     },
     representatives: [{
         type: mongoose.Schema.ObjectId,
@@ -14,9 +13,6 @@ const RepresentativeSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'request'
     }],
-    contactInfo: {
-        
-    },
     username: {
         type: String,
         trim: true,
@@ -27,10 +23,6 @@ const RepresentativeSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
-    },
-    rating: {
-        type: Number,
-        default: -1 // No rating
     },
     pic: {
         type: String,

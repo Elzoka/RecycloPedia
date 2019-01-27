@@ -1,14 +1,12 @@
 const mongoose = require('mongoose');
+const AddressSchema = require('./shema/AddressSchema');
 
 const CompanySchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-
     },
-    address: {
-
-    },
+    address: AddressSchema,
     points: {
         type: Number,
         default: 0
@@ -29,7 +27,20 @@ const CompanySchema = new mongoose.Schema({
         ref: 'plan'
     }],
     contactInfo: {
-        
+        email: {
+            type: String,
+            trim: true,
+            lowercase: true
+        },
+        phone: {
+            type: String,
+            trim: true,
+            required: true
+        },
+        fax: {
+            type: String,
+            trim: true,
+        }
     },
     email: {
         type: String,

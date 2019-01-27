@@ -1,10 +1,14 @@
 const mongoose = require('mongoose');
 
 const RequestSchema = new mongoose.Schema({
-    item: {
-        // itemSchema
+    plan: {
+        type: mongoose.Schema.ObjectId,
+        required: true
     },
-    numberOfItems: Number,
+    numberOfItems: {
+        type: Number,
+        default: 1
+    },
     client: {
         type: mongoose.Schema.ObjectId,
         ref: 'client',
@@ -22,10 +26,19 @@ const RequestSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: [] // on going, fullfilled, etc
+        enum: ['sent', 'declined', 'stalled', 'approved', 'fullfilled'], // on going, fullfilled, etc
+        trim: true,
+        lowercase: true,
+        default: 'sent'
     },
-    fullfilledAt: Date,
-    points: Number
+    fullfilledAt: {
+        type: Date,
+        default: null
+    },
+    points: {
+        type: Number,
+        default: 0
+    }
 });
 
-module.exports('request', RequestSchema)
+module.exports = mongoose.model('request', RequestSchema)
