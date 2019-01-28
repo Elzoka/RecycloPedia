@@ -33,6 +33,10 @@ const ClientSchema = new mongoose.Schema({
     rating: {
         type: Number,
         default: -1 // No rating
+    },
+    createdAt: {
+        type: Date,
+        required: true
     }
 });
 

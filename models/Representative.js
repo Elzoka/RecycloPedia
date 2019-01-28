@@ -24,6 +24,10 @@ const RepresentativeSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    createdAt: {
+        type: Date,
+        required: true
+    },
     pic: {
         type: String,
         default: "/rep/12" // default it to random logo

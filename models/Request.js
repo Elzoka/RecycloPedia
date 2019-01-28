@@ -26,10 +26,14 @@ const RequestSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['sent', 'declined', 'stalled', 'approved', 'fullfilled'], // on going, fullfilled, etc
+        enum: ['sent', 'approved', 'assigned', 'fullfilled'], // on going, fullfilled, etc
         trim: true,
         lowercase: true,
         default: 'sent'
+    },
+    createdAt: {
+        type: Date,
+        required: true
     },
     fullfilledAt: {
         type: Date,
