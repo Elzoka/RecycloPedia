@@ -92,10 +92,11 @@ CompanySchema.pre('save', function (next) {
     }
 });
 
-CompanySchema.methods.generateAuthToken = (agent) => {
+CompanySchema.methods.generateAuthToken = () => {
     return new Promise((resolve, reject) => {
         // sign the token
-        jwt.sign({_id: this._id, agent}, config.JWT_SECRET, (err, token) => {
+        // @TODO sign other useful data
+        jwt.sign({id: this._id, user: 'company'}, config.JWT_SECRET, (err, token) => {
             if(err){
                 reject(err);
             }else{
