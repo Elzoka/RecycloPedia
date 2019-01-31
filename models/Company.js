@@ -63,7 +63,7 @@ const CompanySchema = new mongoose.Schema({
         type: Date,
         default: Date.now()
     },
-    rating: {
+    rating: { // @TODO change it to array of objects
         type: Number,
         default: -1 // No rating
     },
