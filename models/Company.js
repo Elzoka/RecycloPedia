@@ -11,7 +11,7 @@ const CompanySchema = new mongoose.Schema({
         required: true,
         maxlength: 30
     },
-    address: AddressSchema,
+    address: [AddressSchema],
     points: {
         type: Number,
         default: 0

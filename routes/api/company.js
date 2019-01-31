@@ -1,10 +1,9 @@
 const companyRoutes = require('express').Router();
 const bcrypt = require('bcryptjs');
-const mongoose = require('mongoose');
 
 const Company = require('../../models/Company');
-const {createCompanyObject} = require('../../lib/company');
-// const isLoggedIn = require('../../middlwares/isLoggedIn');
+const {createCompanyObject, updatedCompanyFields} = require('../../lib/company');
+const isLoggedIn = require('../../middlwares/isLoggedIn');
 
 // @@@@@ TODO ===>  ADD SUITABLE ERROR MESSAGES
 
@@ -27,7 +26,7 @@ companyRoutes.post('/', (req, res) => {
             // return token to user
             savedCompany.generateAuthToken()
                 .then(token => {
-                    res.status(200).send({auth: true, token, company: savedCompany});
+                    res.status(200).send({auth: true, token});
                 })
                 .catch(e => {
                     res.status(500).send({auth: false, error: e});
@@ -94,6 +93,23 @@ companyRoutes.get('/:id', (req, res) => {
     })
 });
 
+companyRoutes.put('/:id', isLoggedIn, (req, res) => {
+    if(req.params.id !== req.companyId){
+        return res.status(401).json({message: 'unauthorized'});
+    }
+    const updatedCompanyObject = updatedCompanyFields(req.body);
+    
+    Company.updateOne(
+        {_id: req.companyId},
+        {$set: updatedCompanyObject}
+    )
+    .then(result => {
+        res.status(200).send(result)
+    })
+    .catch(err => {
+        res.status(500).send({message: "Internal Server Error"});
+    })
+});
 
 // Auth
 
