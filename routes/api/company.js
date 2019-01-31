@@ -1,10 +1,10 @@
 const companyRoutes = require('express').Router();
 const bcrypt = require('bcryptjs');
-
+const mongoose = require('mongoose');
 
 const Company = require('../../models/Company');
 const {createCompanyObject} = require('../../lib/company');
-const isLoggedIn = require('../../middlwares/isLoggedIn');
+// const isLoggedIn = require('../../middlwares/isLoggedIn');
 
 // @@@@@ TODO ===>  ADD SUITABLE ERROR MESSAGES
 
@@ -65,6 +65,35 @@ companyRoutes.get('/', (req, res) => {
         res.status(500).json({message: 'Internal Server error'});
     })
 });
+
+// @route  GET api/company:id 
+// @desc   get company by id
+// @access Public
+
+companyRoutes.get('/:id', (req, res) => {
+    const companyId = req.params.id;
+
+    Company
+    .findOne(
+        {_id: companyId},
+        {representatives: 0,
+            requests: 0,
+            email: 0,
+            password: 0,
+        }
+    )
+    .then(company => {
+        if(!company){
+            return res.status(404).json({message: 'Company not found'});
+        }
+        res.status(200).json({company});
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(400).json({message: 'Invalid Company Id'});
+    })
+});
+
 
 // Auth
 
