@@ -92,7 +92,7 @@ CompanySchema.pre('save', function (next) {
     }
 });
 
-CompanySchema.methods.generateAuthToken = () => {
+CompanySchema.methods.generateAuthToken = function() {
     return new Promise((resolve, reject) => {
         // sign the token
         // @TODO sign other useful data

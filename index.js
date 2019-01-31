@@ -14,6 +14,6 @@ mongoose.connect(config.MONGODB_URI, {
 const routes = require('./routes');
 app.use('/', routes);
 
-app.listen(3001, () => {
-    console.log('\x1b[36m%s\x1b[0m', "The server is up on port 3000");
+app.listen(config.PORT, () => {
+    console.log('\x1b[36m%s\x1b[0m', `The server is up on port ${config.PORT}`);
 });
