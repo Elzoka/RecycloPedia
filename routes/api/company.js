@@ -93,6 +93,10 @@ companyRoutes.get('/:id', (req, res) => {
     })
 });
 
+
+// @route  PUT api/company:id 
+// @desc   update company by id
+// @access Private (company)
 companyRoutes.put('/:id', isLoggedIn, (req, res) => {
     if(req.params.id !== req.companyId){
         return res.status(401).json({message: 'unauthorized'});
@@ -102,6 +106,23 @@ companyRoutes.put('/:id', isLoggedIn, (req, res) => {
     Company.updateOne(
         {_id: req.companyId},
         {$set: updatedCompanyObject}
+    )
+    .then(result => {
+        res.status(200).send(result)
+    })
+    .catch(err => {
+        res.status(500).send({message: "Internal Server Error"});
+    })
+});
+
+
+// @route  DELETE api/company
+// @desc   delete company
+// @access Private (company)
+companyRoutes.delete('/', isLoggedIn, (req, res) => {
+
+    Company.deleteOne(
+        {_id: req.companyId},
     )
     .then(result => {
         res.status(200).send(result)
