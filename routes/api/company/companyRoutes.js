@@ -121,6 +121,7 @@ companyRoutes.put('/:id', isAuthenticatedCompany, (req, res) => {
 // @access Private (company)
 companyRoutes.delete('/', isAuthenticatedCompany, (req, res) => {
 
+    // @TODO create a transaction to remove all associated reps and requests
     Company.deleteOne(
         {_id: req.companyId},
     )

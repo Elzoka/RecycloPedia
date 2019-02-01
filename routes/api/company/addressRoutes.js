@@ -1,5 +1,4 @@
 const addressRoutes = require('express').Router();
-
 const isAuthenticatedCompany = require('../../../middlwares/isAuthenticatedCompany');
 const {createAddress, updatedAddressField} = require('../../../lib/company');
 const Company = require('../../../models/Company');
@@ -28,7 +27,7 @@ addressRoutes.put('/:id', isAuthenticatedCompany,(req, res) => {
     const addressFields = updatedAddressField(req.body);
     Company.updateOne(
             {_id: req.companyId, "address._id": req.params.id},
-            {$set: {"address.$": addressFields}},
+            {$set: {"address.$": addressFields}}, // @TODO stop auto updating id
         )
         .then(result => {
             res.status(200).json({result});
@@ -38,6 +37,18 @@ addressRoutes.put('/:id', isAuthenticatedCompany,(req, res) => {
             if(err.name === 'ValidationError' || err.name === "CastError"){
                 return res.status(400).send({message: "invalid request"})
             }
+            res.status(500).send({message: "internal server error"})
+        });
+});
+
+addressRoutes.delete("/:id", isAuthenticatedCompany, (req, res) => {
+    Company
+        .updateOne({_id: req.companyId}, {$pull: {address: {_id: req.params.id}}})
+        .then(result => {
+            res.status(200).json({result});
+        })
+        .catch(err => {
+            console.log(err);
             res.status(500).send({message: "internal server error"})
         });
 });
