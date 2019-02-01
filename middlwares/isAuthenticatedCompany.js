@@ -15,7 +15,7 @@ module.exports = (req, res, next) => {
                     if(!company){
                         return res.status(401).json({auth: false, message: 'UnAuthorized'});
                     }
-                    req.companyId = company.id;
+                    req.companyId = company._id;
                     next();
                 })
                 .catch(err => {
