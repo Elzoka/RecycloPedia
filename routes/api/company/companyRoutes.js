@@ -2,7 +2,7 @@ const companyRoutes = require('express').Router();
 
 const Company = require('../../../models/Company');
 const {createCompanyObject, updatedCompanyFields} = require('../../../lib/company');
-const isLoggedIn = require('../../../middlwares/isLoggedIn');
+const isAuthenticatedCompany = require('../../../middlwares/isAuthenticatedCompany');
 
 // @@@@@ TODO ===>  ADD SUITABLE ERROR MESSAGES
 
@@ -96,7 +96,7 @@ companyRoutes.get('/:id', (req, res) => {
 // @route  PUT api/company:id 
 // @desc   update company by id
 // @access Private (company)
-companyRoutes.put('/:id', isLoggedIn, (req, res) => {
+companyRoutes.put('/:id', isAuthenticatedCompany, (req, res) => {
     if(req.params.id !== req.companyId){
         return res.status(401).json({message: 'unauthorized'});
     }
@@ -104,7 +104,8 @@ companyRoutes.put('/:id', isLoggedIn, (req, res) => {
     
     Company.updateOne(
         {_id: req.companyId},
-        {$set: updatedCompanyObject}
+        {$set: updatedCompanyObject},
+        {runValidators: true}
     )
     .then(result => {
         res.status(200).send(result)
@@ -118,7 +119,7 @@ companyRoutes.put('/:id', isLoggedIn, (req, res) => {
 // @route  DELETE api/company
 // @desc   delete company
 // @access Private (company)
-companyRoutes.delete('/', isLoggedIn, (req, res) => {
+companyRoutes.delete('/', isAuthenticatedCompany, (req, res) => {
 
     Company.deleteOne(
         {_id: req.companyId},

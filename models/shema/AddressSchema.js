@@ -25,4 +25,4 @@ const AddressSchema = new mongoose.Schema({
     }
 }, {_id: false});
 
-module.exports = AddressSchema.obj;
+module.exports = AddressSchema;

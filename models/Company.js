@@ -32,20 +32,20 @@ const CompanySchema = new mongoose.Schema({
         ref: 'plan'
     }],
     contactInfo: {
-        email: { // workEmail
+        email: [{ // workEmail
             type: String,
             trim: true,
             lowercase: true
-        },
-        phone: {
+        }],
+        phone: [{
             type: String,
             trim: true,
             required: true
-        },
-        fax: {
+        }],
+        fax: [{
             type: String,
             trim: true,
-        }
+        }]
     },
     email: {
         type: String,
