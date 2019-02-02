@@ -40,7 +40,6 @@ const CompanySchema = new mongoose.Schema({
         phone: [{
             type: String,
             trim: true,
-            required: true
         }],
         fax: [{
             type: String,
@@ -71,6 +70,7 @@ const CompanySchema = new mongoose.Schema({
         type: String,
         default: "12" // default it to random logo
     }
+    // @TODO add payment history
 });
 
 CompanySchema.pre('save', function (next) {
