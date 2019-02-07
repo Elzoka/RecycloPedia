@@ -35,7 +35,7 @@ const CompanySchema = new mongoose.Schema({
         email: [{ // workEmail
             type: String,
             trim: true,
-            lowercase: true
+            lowercase: true,
         }],
         phone: [{
             type: String,
@@ -65,7 +65,7 @@ const CompanySchema = new mongoose.Schema({
     rating: { // @TODO change it to array of objects
         type: Number,
         default: -1 // No rating
-    },
+    }, // @TODO add feedback
     logo: {
         type: String,
         default: "12" // default it to random logo
@@ -73,6 +73,7 @@ const CompanySchema = new mongoose.Schema({
     // @TODO add payment history
 });
 
+// hash the password before saving
 CompanySchema.pre('save', function (next) {
     if(this.isModified('password')){
         // hash the password

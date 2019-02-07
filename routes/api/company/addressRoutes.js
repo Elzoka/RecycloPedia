@@ -3,6 +3,10 @@ const isAuthenticatedCompany = require('../../../middlwares/isAuthenticatedCompa
 const {createAddress, updatedAddressField} = require('../../../lib/company');
 const Company = require('../../../models/Company');
 
+// @route  POST api/company/address 
+// @desc   add new address
+// @access Private
+
 addressRoutes.post('/', isAuthenticatedCompany, (req, res) => {
     const address = createAddress(req.body);
     Company
@@ -23,6 +27,10 @@ addressRoutes.post('/', isAuthenticatedCompany, (req, res) => {
         });
 });
 
+// @route  PUT api/company/address 
+// @desc   update existing address
+// @access Private
+
 addressRoutes.put('/:id', isAuthenticatedCompany,(req, res) => {
     const addressFields = updatedAddressField(req.body);
     Company.updateOne(
@@ -40,6 +48,10 @@ addressRoutes.put('/:id', isAuthenticatedCompany,(req, res) => {
             res.status(500).send({message: "internal server error"})
         });
 });
+
+// @route  DELETE api/company/address 
+// @desc   delete existing address
+// @access Private
 
 addressRoutes.delete("/:id", isAuthenticatedCompany, (req, res) => {
     Company
