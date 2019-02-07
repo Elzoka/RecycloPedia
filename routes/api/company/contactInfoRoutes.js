@@ -34,6 +34,43 @@ contactInfoRoutes.post('/', isAuthenticatedCompany, (req, res) => {
 });
 
 
+// @route  PUT api/company/contact-info 
+// @desc   update existing contactInfo
+// @access Private
+
+contactInfoRoutes.put('/:fieldValue', isAuthenticatedCompany, (req, res) => {
+    // validate data
+    const updates = createContactInfo(req.body);
+    const updatesKeys = Object.keys(updates);
+    
+    // check if there's data to update
+    if(updatesKeys.length === 0){
+        return res.status(400).json({message: 'no or invalid data was sent'})
+    }
+    // check that only one field is provided
+    if(updatesKeys.length !== 1){
+        return res.status(400).json({message: 'only one field can be provided'})
+    }
+
+    const deletedFieldKey = updatesKeys[0];
+    const deletedFieldValue = req.params.fieldValue;
+    const newValue = updates[deletedFieldKey];
+
+    // update the value
+    Company
+        .updateOne(
+            {_id: req.companyId, [`contactInfo.${deletedFieldKey}`]: deletedFieldValue},
+            {[`contactInfo.${deletedFieldKey}.$`]: newValue}
+            )
+        .then(result => {
+            res.status(200).json({result});
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({message: 'internal server error'})
+        })
+});
+
 // @route  DELETE api/company/contact-info 
 // @desc   delete existing contactInfo
 // @access Private
@@ -48,14 +85,20 @@ contactInfoRoutes.delete('/', isAuthenticatedCompany, (req, res) => {
         return res.status(400).json({message: 'no or invalid data was sent'})
     }
 
+    // check that only one field is provided
+    if(updatesKeys.length !== 1){
+        return res.status(400).json({message: 'only one field can be provided'})
+    }
+    
     const updatedfield = updates[updatesKeys[0]];
 
     Company.updateOne({_id: req.companyId}, {$pull: {[`contactInfo.${updatesKeys[0]}`]: updatedfield}})
         .then(result => {
-            res.send(result); 
+            res.status(200).json({result});             
         })
         .catch(err => {
-            res.send(err);
+            console.log(err);
+            res.status(500).json({message: 'internal server error'})
         });
 });
 
