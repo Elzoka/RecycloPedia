@@ -24,7 +24,7 @@ const CompanySchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'request'
     }],
-    serviceAvailableIn: [{
+    serviceAvailableIn: [{ // @TODO add REST routes when more info available
         type: String
     }],
     plans: [{

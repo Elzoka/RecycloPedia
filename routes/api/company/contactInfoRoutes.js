@@ -1,4 +1,5 @@
 const contactInfoRoutes = require('express').Router();
+const log = require('../../../lib/log');
 
 const Company = require('../../../models/Company');
 const {createContactInfo} = require('../../../lib/company');
@@ -16,6 +17,8 @@ contactInfoRoutes.post('/', isAuthenticatedCompany, (req, res) => {
     if(updatesKeys.length === 0){
         return res.status(400).json({message: 'no or invalid data was sent'})
     }
+    
+    // @TODO limit the max size of each field array to 3
 
     // modify the request to db
     const updatesObj = {}
@@ -25,6 +28,7 @@ contactInfoRoutes.post('/', isAuthenticatedCompany, (req, res) => {
     Company
         .updateOne({_id: req.companyId},{$addToSet:  updatesObj})
         .then(result => {
+            log.response(200, result);
             res.status(200).json({result});
         })
         .catch(err => {
@@ -89,6 +93,8 @@ contactInfoRoutes.delete('/', isAuthenticatedCompany, (req, res) => {
     if(updatesKeys.length !== 1){
         return res.status(400).json({message: 'only one field can be provided'})
     }
+
+    // @TODO check if there's more than one value in the field array
     
     const updatedfield = updates[updatesKeys[0]];
 

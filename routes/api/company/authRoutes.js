@@ -46,4 +46,6 @@ authRoutes.post('/login', (req, res) => {
     })
 });
 
+// @TODO add validate email route
+
 module.exports = authRoutes;

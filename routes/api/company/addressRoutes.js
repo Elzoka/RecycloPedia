@@ -8,6 +8,8 @@ const Company = require('../../../models/Company');
 // @access Private
 
 addressRoutes.post('/', isAuthenticatedCompany, (req, res) => {
+    // @TODO limit the max size of addresses array to 10
+
     const address = createAddress(req.body);
     Company
         .updateOne(
