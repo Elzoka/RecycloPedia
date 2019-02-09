@@ -2,12 +2,15 @@ const addressRoutes = require('express').Router();
 const isAuthenticatedCompany = require('../../../middlwares/isAuthenticatedCompany');
 const {createAddress, updatedAddressField} = require('../../../lib/company');
 const Company = require('../../../models/Company');
+const log = require('../../../lib/log');
 
 // @route  POST api/company/address 
 // @desc   add new address
 // @access Private
 
 addressRoutes.post('/', isAuthenticatedCompany, (req, res) => {
+    let statusCode;
+    let response;
     // @TODO limit the max size of addresses array to 10
 
     const address = createAddress(req.body);
@@ -18,14 +21,28 @@ addressRoutes.post('/', isAuthenticatedCompany, (req, res) => {
             {runValidators: true}
         )
         .then(result => {
-            res.status(200).send({result});
+            statusCode = 200;
+            response = {result};
+
+            log.response(statusCode, response);
+            res.status(statusCode).json(response);
         })
-        .catch(err => {
-            console.log(err);
+        .catch(error => {
             if(err.name === 'ValidationError' || err.name === "CastError"){
-                return res.status(400).send({message: "invalid request"})
+                statusCode = 400;
+                response = {message: "invalid request"};
+
+                log.response(statusCode, response);
+                return res.status(statusCode).json(response);
             }
-            res.status(500).send({message: "internal server error"})
+            statusCode = 500;
+            response = {message: "internal server error"};
+
+            log.err(statusCode, {
+                response,
+                error
+            })
+            res.status(statusCode).json(response);
         });
 });
 
@@ -40,14 +57,30 @@ addressRoutes.put('/:id', isAuthenticatedCompany,(req, res) => {
             {$set: {"address.$": addressFields}}, // @TODO stop auto updating id
         )
         .then(result => {
-            res.status(200).json({result});
+            statusCode = 200;
+            response = {result};
+
+            log.response(statusCode, response);
+            res.status(statusCode).json(response);
         })
-        .catch(err => {
+        .catch(error => {
             console.log(err);
             if(err.name === 'ValidationError' || err.name === "CastError"){
-                return res.status(400).send({message: "invalid request"})
+                statusCode = 400;
+                response = {message: "invalid request"};
+
+                log.response(statusCode, response);
+                return res.status(statusCode).json(response)
             }
-            res.status(500).send({message: "internal server error"})
+
+            statusCode = 500;
+            response = {message: "internal server error"};
+
+            log.err(statusCode, {
+                response,
+                error
+            })
+            res.status(statusCode).json(response);
         });
 });
 
@@ -59,11 +92,22 @@ addressRoutes.delete("/:id", isAuthenticatedCompany, (req, res) => {
     Company
         .updateOne({_id: req.companyId}, {$pull: {address: {_id: req.params.id}}})
         .then(result => {
-            res.status(200).json({result});
+            statusCode = 200;
+            response = {result};
+
+            log.response(statusCode, response);
+            res.status(statusCode).json(response);
         })
-        .catch(err => {
-            console.log(err);
-            res.status(500).send({message: "internal server error"})
+        .catch(error => {
+            statusCode = 500;
+            response = {message: "internal server error"};
+
+            log.err(statusCode, {
+                response,
+                error
+            })
+            res.status(statusCode).json(response);
+            
         });
 });
 

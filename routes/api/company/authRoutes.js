@@ -2,6 +2,7 @@ const authRoutes = require('express').Router();
 const bcrypt = require('bcryptjs');
 
 const Company = require('../../../models/Company');
+const log = require('../../../lib/log');
 
 // Auth
 
@@ -10,39 +11,65 @@ const Company = require('../../../models/Company');
 // @access Public
 
 authRoutes.post('/login', (req, res) => {
-    const email = req.body.email && typeof req.body.email === 'string' ? req.body.email : null; 
-    const password = req.body.password && typeof req.body.password === 'string' ? req.body.password : null; 
+    let statusCode;
+    let response;
+
+    let {email, password} = req.body; 
+    email = email && typeof email === 'string' ? email : null; 
+    password = password && typeof password === 'string' ? password : null; 
 
     if(!email || !password){
-        return res.status(401).json({auth: false, message: 'Invalid email or password'});
+        statusCode = 401;
+        response = {auth: false, message: 'Invalid email or password'};
+
+        log(statusCode, response);
+        return res.status(statusCode).json(response);
     }
 
     Company
     .findOne({email}, {password: 1})
     .then(company => {
         if(!company){
-            return res.status(404).json({auth: false, message: 'this email doesn\'t exist'});
+            statusCode = 404;
+            response = {auth: false, message: 'this email doesn\'t exist'};
+
+            log.response(statusCode, response);
+            return res.status(statusCode).json(response);
         }
-        bcrypt.compare(password, company.password)
+        return bcrypt
+        .compare(password, company.password)
         .then(result => {
             if(result){
-                company.generateAuthToken()
+                return company
+                .generateAuthToken()
                 .then(token => {
-                    res.status(200).json({auth: true, token});
-                })
-                .catch(err => {
-                    res.status(500).json({auth: false, message: 'Internal Server Error'})  
+                    statusCode = 200;
+                    response = {auth: true, token};
+
+                    log.response(statusCode, {
+                        ...response,
+                        token: !!token
+                    })
+                    res.status(statusCode).json(response);
                 })
             }else{
-                res.status(401).json({auth: false, message: 'Invalid email or password'});
+                statusCode = 401;
+                response = {auth: false, message: 'Invalid email or password'};
+
+                log.response(statusCode, response);
+                res.status(statusCode).json(response);
             }
         })
-        .catch(err => {
-            res.status(500).json({auth: false, message: 'Internal Server Error'})  
-        })
     })
-    .catch(err => {
-        res.status(500).json({auth: false, message: 'Internal Server Error'})              
+    .catch(error => {
+        statusCode = 500;
+        response = {auth: false, message: 'Internal Server Error'};
+
+        log.err(statusCode, {
+            response,
+            error
+        });
+        res.status(statusCode).json(response);              
     })
 });
 
