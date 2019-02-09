@@ -3,7 +3,6 @@ const companyRoutes = require('express').Router();
 const Company = require('../../../models/Company');
 const {createCompanyObject, updatedCompanyFields} = require('../../../lib/company');
 const isAuthenticatedCompany = require('../../../middlwares/isAuthenticatedCompany');
-const log = require('../../../lib/log');
 
 // @@@@@ TODO ===>  ADD SUITABLE ERROR MESSAGES
 
@@ -12,7 +11,7 @@ const log = require('../../../lib/log');
 // @access Public
 
 companyRoutes.post('/', (req, res) => {
-    let statusCode;
+    // let statusCode;
     let response;
     const companyObj = createCompanyObject(req.body);
 
@@ -23,41 +22,26 @@ companyRoutes.post('/', (req, res) => {
             // return token to user
             savedCompany.generateAuthToken()
                 .then(token => {
-                    statusCode = 200;
                     response = {auth: true, token};
 
-                    log.response(statusCode, {
-                        ...response,
-                        token: !!token
-                    })
-                    res.status(response).json(response);
+                    res.status(200).sendJson(response);
                 })
                 .catch(error => {
-                    statusCode = 500;
                     response = {
                         auth: false,
                         message: 'internal server error'
                     };
 
-                    log.err(statusCode, {
-                        response,
-                        error
-                    });
-                    res.status(statusCode).json(response);
+                    res.status(500).sendError(error, response);
                 });
         })
         .catch(error => {
-            statusCode = 400;
             response = {
                 auth: false,
                 message: 'invalid data'
             };
 
-            log.response(statusCode, {
-                response,
-                error
-            });
-            res.status(statusCode).json(response);
+            res.status(400).sendJson(response);
         });
 });
 
@@ -67,7 +51,6 @@ companyRoutes.post('/', (req, res) => {
 // @access Public
 
 companyRoutes.get('/', (req, res) => {
-    let statusCode;
     let response;
     // pagination
     const page = req.query.page || 1;
@@ -80,24 +63,16 @@ companyRoutes.get('/', (req, res) => {
     .skip((page - 1) * limit)
     .limit(limit)
     .then(companies => {
-        statusCode = 200;
         response = {
             companies
         };
 
-        log.response(statusCode, response);
-        res.status(statusCode).json(response);
+        res.status(200).sendJson(response);
     })
     .catch(error => {
-        statusCode = 500;
         response = {message: 'Internal Server error'};
 
-        log.err(statusCode, {
-            response,
-            error
-        });
-
-        res.status(statusCode).json(response);
+        res.status(500).sendError(error, response);
     })
 });
 
@@ -106,7 +81,6 @@ companyRoutes.get('/', (req, res) => {
 // @access Public
 
 companyRoutes.get('/:id', (req, res) => {
-    let statusCode;
     let response;
     const companyId = req.params.id;
 
@@ -122,27 +96,18 @@ companyRoutes.get('/:id', (req, res) => {
     )
     .then(company => {
         if(!company){
-            statusCode = 404;
             response = {message: 'Company not found'};
 
-            log.response(statusCode, response);
-            return res.status(statusCode).json(response);
+            return res.status(404).sendJson(response);
         }
-        statusCode = 200;
         response = {company};
 
-        log.response(statusCode, response);
-        res.status(statusCode).json(response);
+        res.status(200).sendJson(response);
     })
     .catch(error => {
-        statusCode = 400;
         response = {message: 'Invalid Company Id'};
 
-        log.response(statusCode, {
-            response,
-            error
-        });
-        res.status(status).json(response);
+        res.status(400).sendJson(response);
     })
 });
 
@@ -151,7 +116,6 @@ companyRoutes.get('/:id', (req, res) => {
 // @desc   update company by id
 // @access Private (company)
 companyRoutes.put('/', isAuthenticatedCompany, (req, res) => {
-    let statusCode;
     let response;
     
     const updatedCompanyObject = updatedCompanyFields(req.body);
@@ -163,22 +127,14 @@ companyRoutes.put('/', isAuthenticatedCompany, (req, res) => {
     )
     .then(result => {
         // @TODO add 404 status code for result.n = 0;
-        statusCode = 200;
         response = {result};
 
-        log.response(statusCode, response);
-        res.status(statusCode).json(response);
+        res.status(200).sendJson(response);
     })
     .catch(error => {
-        statusCode = 500;
         response = {message: "Internal Server Error"};
 
-        log.response(statusCode, {
-            response,
-            error
-        });
-
-        res.status(statusCode).json(response);
+        res.status(500).sendError(error, response);
     })
 });
 
@@ -193,22 +149,14 @@ companyRoutes.delete('/', isAuthenticatedCompany, (req, res) => {
         {_id: req.companyId},
     )
     .then(result => {
-        statusCode = 200;
         response = {result};
 
-        log.response(statusCode, response);
-        res.status(statusCode).json(response)
+        res.status(200).sendJson(response)
     })
     .catch(error => {
-        statusCode = 500;
         response = {message: "Internal Server Error"};
 
-        log.response(statusCode, {
-            response,
-            error
-        });
-
-        res.status(statusCode).json(response);
+        res.status(500).sendError(error, response);
     });
 });
 

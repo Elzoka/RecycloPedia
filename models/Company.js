@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config');
 const AddressSchema = require('./shema/AddressSchema');
 
-const CompanySchema = new mongoose.Schema({
+const CompanySchema = new mongoose.Schema({ // @TODO add transaction => incoming out going
     name: {
         type: String,
         required: true,

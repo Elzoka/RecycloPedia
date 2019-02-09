@@ -1,5 +1,4 @@
 const contactInfoRoutes = require('express').Router();
-const log = require('../../../lib/log');
 
 const Company = require('../../../models/Company');
 const {createContactInfo} = require('../../../lib/company');
@@ -10,19 +9,15 @@ const isAuthenticatedCompany = require('../../../middlwares/isAuthenticatedCompa
 // @access Private
 
 contactInfoRoutes.post('/', isAuthenticatedCompany, (req, res) => {
-    let statusCode;
     let response;
     // validate data
     const updates = createContactInfo(req.body);
     const updatesKeys = Object.keys(updates);
     // check if there's data to update
     if(updatesKeys.length === 0){
-        statusCode = 400;
         response = {message: 'no or invalid data was sent'};
-        
-        log.response(statusCode, response);
 
-        return res.status(statusCode).json(response);
+        return res.status(400).sendJson(response);
     }
     
     // @TODO limit the max size of each field array to 3
@@ -35,19 +30,12 @@ contactInfoRoutes.post('/', isAuthenticatedCompany, (req, res) => {
     Company
         .updateOne({_id: req.companyId},{$addToSet:  updatesObj})
         .then(result => {
-            statusCode = 200;
-            response = {
-                result
-            }
-
-            log.response(statusCode, response);
-            res.status(statusCode).json(response);
+            response = {result};
+            res.status(200).sendJson(response);
         })
         .catch(error => {
-            statusCode = 500;
             response = {message: 'internal server error'};
-            log.err(statusCode, {error, response});
-            res.status(statusCode).json(response)
+            res.status(500).sendError(error, response); 
         });
 });
 
@@ -57,7 +45,6 @@ contactInfoRoutes.post('/', isAuthenticatedCompany, (req, res) => {
 // @access Private
 
 contactInfoRoutes.put('/:fieldValue', isAuthenticatedCompany, (req, res) => {
-    let statusCode;
     let response;
     // validate data
     const updates = createContactInfo(req.body);
@@ -65,19 +52,15 @@ contactInfoRoutes.put('/:fieldValue', isAuthenticatedCompany, (req, res) => {
     
     // check if there's data to update
     if(updatesKeys.length === 0){
-        statusCode = 400;
-        response = {message: 'no or invalid data was sent'};
-        log.response(statusCode, response);
 
-        return res.status(400).json(response)
+        response = {message: 'no or invalid data was sent'};
+        return res.status(400).sendJson(response)
     }
     // check that only one field is provided
     if(updatesKeys.length !== 1){
-        statusCode = 400;
         response = {message: 'only one field can be provided'};
-        log.response(statusCode, response);
 
-        return res.status(statusCode).json(response);
+        return res.status(400).sendJson(response);
     }
 
     const deletedFieldKey = updatesKeys[0];
@@ -91,21 +74,16 @@ contactInfoRoutes.put('/:fieldValue', isAuthenticatedCompany, (req, res) => {
             {[`contactInfo.${deletedFieldKey}.$`]: newValue}
             )
         .then(result => {
-            statusCode = 200;
             response = {
                 result
             }
-
-            log.response(statusCode, response);
     
-            res.status(statusCode).json(response);
+            res.status(200).sendJson(response);
         })
         .catch(error => {
-            statusCode = 500;
             response = {message: 'internal server error'};
-            log.err(statusCode, {error, response});
     
-            res.status(statusCode).json(response);
+            res.status(500).sendError(error, response);
         })
 });
 
@@ -114,7 +92,6 @@ contactInfoRoutes.put('/:fieldValue', isAuthenticatedCompany, (req, res) => {
 // @access Private
 
 contactInfoRoutes.delete('/', isAuthenticatedCompany, (req, res) => {
-    let statusCode;
     let response;
 
     // validate data
@@ -123,20 +100,16 @@ contactInfoRoutes.delete('/', isAuthenticatedCompany, (req, res) => {
     
     // check if there's data to update
     if(updatesKeys.length === 0){
-        statusCode = 400;
         response = {message: 'no or invalid data was sent'};
 
-        log.response(statusCode, response);
-        return res.status(statusCode).json(response);
+        return res.status(400).sendJson(response);
     }
 
     // check that only one field is provided
     if(updatesKeys.length !== 1){
-        statusCode = 400;
         response = {message: 'only one field can be provided'};
 
-        log.response(statusCode, response);
-        return res.status(statusCode).json(response);
+        return res.status(400).sendJson(response);
     }
 
     // @TODO check if there's more than one value in the field array
@@ -145,20 +118,16 @@ contactInfoRoutes.delete('/', isAuthenticatedCompany, (req, res) => {
 
     Company.updateOne({_id: req.companyId}, {$pull: {[`contactInfo.${updatesKeys[0]}`]: updatedfield}})
         .then(result => {
-            statusCode = 200;
             response = {
                 result
             }
 
-            log.response(statusCode, response);
-            res.status(200).json(response);             
+            res.status(200).sendJson(response);             
         })
         .catch(error => {
-            statusCode = 500;
             response = {message: 'internal server error'};
 
-            log.err(statusCode, {error, response});
-            res.status(500).json(response);
+            res.status(500).sendError(error, response);
         });
 });
 

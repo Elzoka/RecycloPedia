@@ -6,8 +6,8 @@ const ClientSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    address: AddressSchema,
-    points: {
+    address: [AddressSchema],
+    points: { // @TODO add transaction incoming & outgoing
         type: Number,
         default: 0
     },
