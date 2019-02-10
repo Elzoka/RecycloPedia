@@ -25,7 +25,7 @@ addressRoutes.post('/', isAuthenticatedCompany, (req, res) => {
             res.status(200).sendJson(response);
         })
         .catch(error => {
-            if(err.name === 'ValidationError' || err.name === "CastError"){
+            if(error.name === 'ValidationError' || error.name === "CastError"){
                 response = {message: "invalid request"};
 
                 return res.status(400).sendJson(response);

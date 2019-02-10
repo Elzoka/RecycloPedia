@@ -41,7 +41,7 @@ companyRoutes.post('/', (req, res) => {
                 message: 'invalid data'
             };
 
-            res.status(400).sendJson(response);
+            res.status(400).sendJson(response);            
         });
 });
 

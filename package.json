@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "devServer": "NODE_DEBUG=server nodemon index.js"
+    "dev:server": "NODE_DEBUG=server nodemon index.js"
   },
   "author": "Mahmoud Elzoka",
   "license": "ISC",

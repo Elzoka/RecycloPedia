@@ -98,7 +98,7 @@ CompanySchema.methods.generateAuthToken = function() {
     return new Promise((resolve, reject) => {
         // sign the token
         // @TODO sign other useful data
-        jwt.sign({id: this._id, user: 'company'}, config.JWT_SECRET, (err, token) => {
+        jwt.sign({id: this._id, user: 'company'}, config.JWT_COMPANY_SECRET, (err, token) => {
             if(err){
                 reject(err);
             }else{
