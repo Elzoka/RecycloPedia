@@ -105,9 +105,14 @@ companyRoutes.get('/:id', (req, res) => {
         res.status(200).sendJson(response);
     })
     .catch(error => {
-        response = {message: 'Invalid Company Id'};
-
-        res.status(400).sendJson(response);
+        if(error.name === 'CastError'){
+            response = {message: 'Invalid Company Id'};
+        
+            return res.status(400).sendJson(response);
+        }
+        
+        response = {message: 'internal server error'};
+        res.status(500).sendError(error ,response);
     })
 });
 
