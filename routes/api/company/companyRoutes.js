@@ -98,7 +98,6 @@ companyRoutes.get('/:id', (req, res) => {
     .findOne(
         {_id: companyId},
         {
-            representatives: 0,
             requests: 0,
             email: 0,
             password: 0,

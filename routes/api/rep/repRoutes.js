@@ -50,9 +50,9 @@ repRoutes.post('/', isAuthenticatedCompany, (req, res) => {
         });
 });
 
-// @route  GET api/company 
-// @desc   get companies
-// @access Public
+// @route  GET api/rep 
+// @desc   get representatives
+// @access Private (company)
 
 repRoutes.get('/', isAuthenticatedCompany, (req, res) => {
     let response;
@@ -76,6 +76,49 @@ repRoutes.get('/', isAuthenticatedCompany, (req, res) => {
         response = {message: 'Internal Server error'};
 
         res.status(500).sendError(error, response);
+    });
+});
+
+// @route  GET api/rep/:id 
+// @desc   get rep by id
+// @access Public 
+
+// @TODO check if maybe make access private
+repRoutes.get('/:id', (req, res) => {
+    let response;
+    const repId = req.params.id;
+
+    Representative
+    .findOne(
+        {_id: repId},
+        {
+            requests: 0,
+            password: 0,
+        }
+    )
+    .populate({
+        path: 'company',
+        select: 'name logo'
+    })
+    .then(rep => {
+        if(!rep){
+            response = {message: 'Representative not found'};
+
+            return res.status(404).sendJson(response);
+        }
+        response = {rep};
+
+        res.status(200).sendJson(response);
+    })
+    .catch(error => {
+        if(error.name === 'CastError'){
+            response = {message: 'Invalid Representative Id'};
+        
+            return res.status(400).sendJson(response);
+        }
+        
+        response = {message: 'internal server error'};
+        res.status(500).sendError(error ,response);
     })
 });
 
