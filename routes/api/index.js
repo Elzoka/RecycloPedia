@@ -15,8 +15,10 @@ api.use(logResponse);
 // routes
 const companyRoutes = require('./company');
 const clientRoutes = require('./client');
+const repRoutes = require('./rep');
 
 api.use('/company', companyRoutes);
 api.use('/client', clientRoutes);
+api.use('/rep', repRoutes);
 
 module.exports = api;

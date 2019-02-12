@@ -161,7 +161,7 @@ clientRoutes.put('/', isAuthenticatedClient, (req, res) => {
 // @access Private (client)
 clientRoutes.delete('/', isAuthenticatedClient, (req, res) => {
 
-    // @TODO create a transaction to remove all associated reps and requests
+    // @TODO create a transaction to remove all associated requests
     Client.deleteOne(
         {_id: req.clientId},
     )

@@ -16,10 +16,6 @@ const CompanySchema = new mongoose.Schema({ // @TODO add transaction => incoming
         type: Number,
         default: 0
     },
-    representatives: [{
-        type: mongoose.Schema.ObjectId,
-        ref: 'rep'
-    }],
     requests: [{
         type: mongoose.Schema.ObjectId,
         ref: 'request'
