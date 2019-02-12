@@ -1,12 +1,12 @@
 const authRoutes = require('express').Router();
 const bcrypt = require('bcryptjs');
 
-const Company = require('../../../models/Company');
+const Client = require('../../../models/Client');
 
 // Auth
 
-// @route  POST api/company/login 
-// @desc   login a Company
+// @route  POST api/client/login 
+// @desc   login a Client
 // @access Public
 
 authRoutes.post('/login', (req, res) => {
@@ -22,19 +22,19 @@ authRoutes.post('/login', (req, res) => {
         return res.status(401).sendJson(response);
     }
 
-    Company
+    Client
     .findOne({email}, {password: 1})
-    .then(company => {
-        if(!company){
+    .then(client => {
+        if(!client){
             response = {auth: false, message: 'this email doesn\'t exist'};
 
             return res.status(404).sendJson(response);
         }
         return bcrypt
-        .compare(password, company.password)
+        .compare(password, client.password)
         .then(result => {
             if(result){
-                return company
+                return client
                 .generateAuthToken()
                 .then(token => {
                     response = {auth: true, token};
