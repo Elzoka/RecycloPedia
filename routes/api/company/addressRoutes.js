@@ -1,6 +1,6 @@
 const addressRoutes = require('express').Router();
 const isAuthenticatedCompany = require('../../../middlwares/isAuthenticatedCompany');
-const {createAddress, updatedAddressField} = require('../../../lib/company');
+const {createAddress, updatedAddressField} = require('../../../lib/address');
 const Company = require('../../../models/Company');
 
 // @route  POST api/company/address 
@@ -8,7 +8,6 @@ const Company = require('../../../models/Company');
 // @access Private
 
 addressRoutes.post('/', isAuthenticatedCompany, (req, res) => {
-    // let statusCode;
     let response;
     // @TODO limit the max size of addresses array to 10
     const address = createAddress(req.body);
@@ -42,9 +41,16 @@ addressRoutes.post('/', isAuthenticatedCompany, (req, res) => {
 addressRoutes.put('/:id', isAuthenticatedCompany,(req, res) => {
     let response;
     const addressFields = updatedAddressField(req.body);
+    const toUpdateKeys = Object.keys(addressFields);
+
+    // create query 
+    const setQuery = {};
+    toUpdateKeys.forEach(key => {
+        setQuery[`address.$.${key}`] = addressFields[key];
+    });
     Company.updateOne(
             {_id: req.companyId, "address._id": req.params.id},
-            {$set: {"address.$": addressFields}}, // @TODO stop auto updating id
+            {$set: setQuery},
         )
         .then(result => {
             response = {result};

@@ -1,6 +1,6 @@
 const addressRoutes = require('express').Router();
 const isAuthenticatedClient = require('../../../middlwares/isAuthenticatedClient');
-const {createAddress} = require('../../../lib/address');
+const {createAddress, updatedAddressField} = require('../../../lib/address');
 const Client = require('../../../models/Client');
 
 // @route  POST api/client/address 
@@ -32,6 +32,42 @@ addressRoutes.post('/', isAuthenticatedClient, (req, res) => {
             }
             response = {message: "internal server error"};
 
+            res.status(500).sendError(error, response);
+        });
+});
+
+
+// @route  PUT api/client/address 
+// @desc   update existing address
+// @access Private
+
+addressRoutes.put('/:id', isAuthenticatedClient,(req, res) => {
+    let response;
+    const addressFields = updatedAddressField(req.body);
+    const toUpdateKeys = Object.keys(addressFields);
+
+    // create query 
+    const setQuery = {};
+    toUpdateKeys.forEach(key => {
+        setQuery[`address.$.${key}`] = addressFields[key];
+    });
+    Client.updateOne(
+            {_id: req.clientId, "address._id": req.params.id},
+            {$set: setQuery},
+        )
+        .then(result => {
+            response = {result};
+
+            res.status(200).sendJson(response);
+        })
+        .catch(error => {
+            if(error.name === 'ValidationError' || error.name === "CastError"){
+                response = {message: "invalid request"};
+
+                return res.status(400).sendJson(response)
+            }
+
+            response = {message: "internal server error"};
             res.status(500).sendError(error, response);
         });
 });
