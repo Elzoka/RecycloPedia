@@ -72,5 +72,30 @@ addressRoutes.put('/:id', isAuthenticatedClient,(req, res) => {
         });
 });
 
+// @route  DELETE api/client/address 
+// @desc   delete existing address
+// @access Private
+
+addressRoutes.delete("/:id", isAuthenticatedClient, (req, res) => {
+    let response;
+    Client
+        .updateOne({_id: req.clientId}, {$pull: {address: {_id: req.params.id}}})
+        .then(result => {
+            response = {result};
+
+            res.status(200).sendJson(response);
+        })
+        .catch(error => {
+            if(error.name === 'ValidationError' || error.name === "CastError"){
+                response = {message: "invalid request"};
+
+                return res.status(400).sendJson(response)
+            }
+
+            response = {message: "internal server error"};
+            res.status(500).sendError(error, response);            
+        });
+});
+
 
 module.exports = addressRoutes;
