@@ -64,7 +64,7 @@ companyRoutes.get('/', (req, res) => {
     let response;
     // pagination
     const page = req.query.page || 1;
-    const limit =  req.query.limit && req.query.limit < 20 ? req.query.limit : 10;
+    const limit =  req.query.limit && req.query.limit <= 20 ? req.query.limit : 10;
 
     // @TODO sort by location - name - createdAt - etc
     Company

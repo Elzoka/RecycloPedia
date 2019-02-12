@@ -47,7 +47,37 @@ repRoutes.post('/', isAuthenticatedCompany, (req, res) => {
             };
 
             res.status(400).sendJson(response);
-        })
+        });
 });
+
+// @route  GET api/company 
+// @desc   get companies
+// @access Public
+
+repRoutes.get('/', isAuthenticatedCompany, (req, res) => {
+    let response;
+    // pagination
+    const page = req.query.page || 1;
+    const limit =  req.query.limit && req.query.limit <= 20 ? req.query.limit : 10;
+
+    Representative
+    .find({company: req.companyId}, {username: 1, pic: 1, name: 1})
+    .sort({username: -1})
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .then(representatives => {
+        response = {
+            representatives
+        };
+
+        res.status(200).sendJson(response);
+    })
+    .catch(error => {
+        response = {message: 'Internal Server error'};
+
+        res.status(500).sendError(error, response);
+    })
+});
+
 
 module.exports = repRoutes;
