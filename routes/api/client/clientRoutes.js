@@ -3,9 +3,6 @@ const clientRoutes = require('express').Router();
 const Client = require('../../../models/Client');
 const isAuthenticatedClient = require('../../../middlwares/isAuthenticatedClient');
 const {createClientObject, updatedClientFields} = require('../../../lib/client');
-// clientRoutes.get('/')
-
-
 
 // @route  POST api/client 
 // @desc   create a new client
@@ -55,13 +52,35 @@ clientRoutes.post('/', (req, res) => {
 });
 
 
-// @TODO {
-
 // @route  GET api/client 
-// @desc   create a new client
-// @access Public
+// @desc   get clients
+// @access Public @TODO (maybe only admins)
 
-// }
+clientRoutes.get('/', (req, res) => {
+    let response;
+    // pagination
+    const page = req.query.page || 1;
+    const limit =  req.query.limit && req.query.limit < 20 ? req.query.limit : 10;
+
+    // @TODO sort by location - name - createdAt - etc
+    Client
+    .find({}, {name: 1, phone: 1, rating: 1})
+    .sort({name: -1})
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .then(clients => {
+        response = {
+            clients
+        };
+
+        res.status(200).sendJson(response);
+    })
+    .catch(error => {
+        response = {message: 'Internal Server error'};
+
+        res.status(500).sendError(error, response);
+    })
+});
 
 // @route  GET api/client:id 
 // @desc   get client by id
