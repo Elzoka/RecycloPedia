@@ -149,10 +149,15 @@ companyRoutes.put('/', isAuthenticatedCompany, (req, res) => {
         // code 11000 refers to duplicate key in email index
         if(error.name === 'MongoError' && error.code === 11000){
             response = {
-                auth: false,
                 message: 'email already exists'
             };
 
+            return res.status(400).sendJson(response);
+        }
+
+        if(error.name === 'CastError'){
+            response = {message: 'Invalid Company Id'};
+        
             return res.status(400).sendJson(response);
         }
         

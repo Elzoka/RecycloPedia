@@ -2,7 +2,7 @@ const repRoutes = require('express').Router();
 
 const Representative = require('../../../models/Representative');
 const isAuthenticatedCompany = require('../../../middlwares/isAuthenticatedCompany');
-const { createRepObject } = require('../../../lib/rep');
+const { createRepObject, updatedRepFields } = require('../../../lib/rep');
 
 // @route  POST api/rep 
 // @desc   create a new rep
@@ -122,5 +122,50 @@ repRoutes.get('/:id', (req, res) => {
     })
 });
 
+
+// @route  PUT api/rep/:id 
+// @desc   update rep
+// @access Private (company)
+
+repRoutes.put('/:id', isAuthenticatedCompany, (req, res) => {
+    let response;
+    
+    const updatedCompanyObject = updatedRepFields(req.body);
+    
+    Representative.updateOne(
+        {
+            _id: req.params.id,
+            company:req.companyId
+        },
+        {$set: updatedCompanyObject},
+        {runValidators: true}
+    )
+    .then(result => {
+        // @TODO add 404 status code for result.n = 0;
+        response = {result};
+
+        res.status(200).sendJson(response);
+    })
+    .catch(error => {
+        // code 11000 refers to duplicate key in email index
+        if(error.name === 'MongoError' && error.code === 11000){
+            response = {
+                message: 'username already exists'
+            };
+
+            return res.status(400).sendJson(response);
+        }
+
+        if(error.name === 'CastError'){
+            response = {message: 'Invalid Representative Id'};
+            return res.status(400).sendJson(response);
+        }
+        
+        
+        response = {message: "Internal Server Error"};
+
+        res.status(500).sendError(error, response);
+    })
+});
 
 module.exports = repRoutes;
