@@ -11,7 +11,6 @@ addressRoutes.post('/', isAuthenticatedCompany, (req, res) => {
     // let statusCode;
     let response;
     // @TODO limit the max size of addresses array to 10
-
     const address = createAddress(req.body);
     Company
         .updateOne(

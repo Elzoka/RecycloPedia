@@ -36,6 +36,16 @@ companyRoutes.post('/', (req, res) => {
                 });
         })
         .catch(error => {
+            // code 11000 refers to duplicate key in email index
+            if(error.name === 'MongoError' && error.code === 11000){
+                response = {
+                    auth: false,
+                    message: 'email already exists'
+                };
+
+                return res.status(400).sendJson(response);
+            }
+
             response = {
                 auth: false,
                 message: 'invalid data'
@@ -76,7 +86,7 @@ companyRoutes.get('/', (req, res) => {
     })
 });
 
-// @route  GET api/company:id 
+// @route  GET api/company/:id 
 // @desc   get company by id
 // @access Public
 
@@ -117,8 +127,8 @@ companyRoutes.get('/:id', (req, res) => {
 });
 
 
-// @route  PUT api/company:id 
-// @desc   update company by id
+// @route  PUT api/company 
+// @desc   update company
 // @access Private (company)
 companyRoutes.put('/', isAuthenticatedCompany, (req, res) => {
     let response;
@@ -137,6 +147,16 @@ companyRoutes.put('/', isAuthenticatedCompany, (req, res) => {
         res.status(200).sendJson(response);
     })
     .catch(error => {
+        // code 11000 refers to duplicate key in email index
+        if(error.name === 'MongoError' && error.code === 11000){
+            response = {
+                auth: false,
+                message: 'email already exists'
+            };
+
+            return res.status(400).sendJson(response);
+        }
+        
         response = {message: "Internal Server Error"};
 
         res.status(500).sendError(error, response);

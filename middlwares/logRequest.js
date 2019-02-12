@@ -8,6 +8,7 @@ module.exports = (req, res, next) => {
     data.body = {...req.body}; // make a copy to change
     data.query = req.query;
     data.params = req.params;
+    data.headers = {...req.headers, "auth": !!req.get("auth")};
 
     if(data.body && data.body.password){
         data.body.password = true;

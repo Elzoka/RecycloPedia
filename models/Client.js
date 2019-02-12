@@ -11,6 +11,7 @@ const ClientSchema = new mongoose.Schema({
         required: true,
     },
     address: [AddressSchema],
+    // @TODO add a pic
     points: { // @TODO add transaction incoming & outgoing
         type: Number,
         default: 0

@@ -1,23 +1,24 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config');
-const Company = require('../models/Company');
+const Client = require('../models/Client');
 
 module.exports = (req, res, next) => {
+    let response;
     const token = req.headers['auth'];
-    jwt.verify(token, config.JWT_COMPANY_SECRET,(err, decoded) => {
-        if(err){
+    jwt.verify(token, config.JWT_CLIENT_SECRET,(error, decoded) => {
+        if(error){
             response = {auth: false, message: 'Unauthorized'};
             return res.status(401).sendJson(response);
         }
 
-        if(decoded.user === 'company'){
-            Company.findOne({_id: decoded.id}, {_id: 1})
-                .then((company) => {
-                    if(!company){
+        if(decoded.user === 'client'){
+            Client.findOne({_id: decoded.id}, {_id: 1})
+                .then((client) => {
+                    if(!client){
                         response = {auth: false, message: 'UnAuthorized'};
                         return res.status(401).sendJson(response);
                     }
-                    req.companyId = company._id;
+                    req.clientId = client._id;
                     next();
                 })
                 .catch(error => {
@@ -29,6 +30,7 @@ module.exports = (req, res, next) => {
             response = {auth: false, message: 'UnAuthorized'};
             res.status(401).sendJson(response);
         }
+
 
     });
 }
