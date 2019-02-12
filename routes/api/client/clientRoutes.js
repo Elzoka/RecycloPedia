@@ -137,4 +137,25 @@ clientRoutes.put('/', isAuthenticatedClient, (req, res) => {
     })
 });
 
+// @route  DELETE api/client
+// @desc   delete client
+// @access Private (client)
+clientRoutes.delete('/', isAuthenticatedClient, (req, res) => {
+
+    // @TODO create a transaction to remove all associated reps and requests
+    Client.deleteOne(
+        {_id: req.clientId},
+    )
+    .then(result => {
+        response = {result};
+
+        res.status(200).sendJson(response)
+    })
+    .catch(error => {
+        response = {message: "Internal Server Error"};
+
+        res.status(500).sendError(error, response);
+    });
+});
+
 module.exports = clientRoutes;
