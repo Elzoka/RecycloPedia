@@ -155,12 +155,6 @@ companyRoutes.put('/', isAuthenticatedCompany, (req, res) => {
             return res.status(400).sendJson(response);
         }
 
-        if(error.name === 'CastError'){
-            response = {message: 'Invalid Company Id'};
-        
-            return res.status(400).sendJson(response);
-        }
-        
         response = {message: "Internal Server Error"};
 
         res.status(500).sendError(error, response);

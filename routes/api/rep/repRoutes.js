@@ -147,6 +147,7 @@ repRoutes.put('/:id', isAuthenticatedCompany, (req, res) => {
         res.status(200).sendJson(response);
     })
     .catch(error => {
+        // @TODO refactor the error section to handle mongodb errors in seprate function
         // code 11000 refers to duplicate key in email index
         if(error.name === 'MongoError' && error.code === 11000){
             response = {
@@ -161,11 +162,38 @@ repRoutes.put('/:id', isAuthenticatedCompany, (req, res) => {
             return res.status(400).sendJson(response);
         }
         
-        
         response = {message: "Internal Server Error"};
 
         res.status(500).sendError(error, response);
     })
 });
+
+// @route  DELETE api/rep/:id
+// @desc   delete rep
+// @access Private (company)
+repRoutes.delete('/:id', isAuthenticatedCompany, (req, res) => {
+    Representative.deleteOne(
+        {
+            _id: req.params.id,
+            company: req.companyId
+        },
+    )
+    .then(result => {
+        response = {result};
+
+        res.status(200).sendJson(response)
+    })
+    .catch(error => {
+        if(error.name === 'CastError'){
+            response = {message: 'Invalid Representative Id'};
+            return res.status(400).sendJson(response);
+        }
+        
+        response = {message: "Internal Server Error"};
+
+        res.status(500).sendError(error, response);
+    });
+});
+
 
 module.exports = repRoutes;
