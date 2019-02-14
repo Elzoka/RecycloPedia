@@ -118,12 +118,15 @@ planRoutes.get('/:id', (req, res) => {
 planRoutes.put('/:id', isAuthenticatedCompany, async (req, res) => {
     let response;
     
-    const {images, ...planObject} = updatedPlanFields(req.body);
+    const {pushImages, pullImage, ...planObject} = updatedPlanFields(req.body);
 
     const updateQuery = {};
-    if(images && images.length > 0){
-        updateQuery['$addToSet'] = {images};
+    if(pushImages && pushImages.length > 0){
+        updateQuery['$addToSet'] = {images: pushImages};
+    }else if(pullImage){
+        updateQuery['$pull'] = {images: pullImage};
     }
+
     if(Object.keys(planObject).length > 0){
         updateQuery['$set'] = planObject;
     }
@@ -188,6 +191,5 @@ planRoutes.delete('/:id', isAuthenticatedCompany, (req, res) => {
         res.status(500).sendError(error, response);
     });
 });
-
 
 module.exports = planRoutes;
