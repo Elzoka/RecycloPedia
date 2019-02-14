@@ -10,7 +10,6 @@ const {createPlanObject} = require('../../../lib/plan');
 // @access Private (company)
 
 planRoutes.post('/', isAuthenticatedCompany,(req, res) => {
-    // let statusCode;
     let response;
     const planObject = createPlanObject(req.body, req.companyId);
 
@@ -39,8 +38,12 @@ planRoutes.post('/', isAuthenticatedCompany,(req, res) => {
 // @access Public
 
 planRoutes.get('/', (req, res) => {
-    // let statusCode;
     let response;
+
+    // pagination
+    const page = req.query.page || 1;
+    const limit =  req.query.limit && req.query.limit <= 20 ? req.query.limit : 10;
+    
     // @TODO maybe check for category validation
 
     // validate the company
@@ -50,6 +53,9 @@ planRoutes.get('/', (req, res) => {
             path: 'company',
             select: 'name logo'
         })
+        .sort({points: -1})
+        .skip((page - 1) * limit)
+        .limit(limit)
         .then(plans => {
             response = {
                 plans
@@ -58,6 +64,44 @@ planRoutes.get('/', (req, res) => {
             res.status(200).sendJson(response);
         })
         .catch(error => {
+            response = {
+                message: 'internal server error'
+            };
+
+            res.status(500).sendError(error, response);            
+        });
+});
+
+// @route  GET api/plan/:id 
+// @desc   get Plans 
+// @access Public
+
+planRoutes.get('/:id', (req, res) => {
+    let response;
+
+    // validate the company
+    Plan
+        .findOne({
+            _id: req.params.id
+        })
+        .populate({
+            path: 'company',
+            select: 'name logo rating'
+        })
+        .then(plan => {
+            response = {
+                plan
+            }
+
+            res.status(200).sendJson(response);
+        })
+        .catch(error => {
+            if(error.name === 'CastError'){
+                response = {message: 'Invalid Plan Id'};
+            
+                return res.status(400).sendJson(response);
+            }
+            
             response = {
                 message: 'internal server error'
             };

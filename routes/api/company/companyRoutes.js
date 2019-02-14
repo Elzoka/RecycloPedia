@@ -11,7 +11,6 @@ const isAuthenticatedCompany = require('../../../middlwares/isAuthenticatedCompa
 // @access Public
 
 companyRoutes.post('/', (req, res) => {
-    // let statusCode;
     let response;
     const companyObj = createCompanyObject(req.body);
 
