@@ -161,4 +161,33 @@ planRoutes.put('/:id', isAuthenticatedCompany, async (req, res) => {
     })
 });
 
+// @route  DELETE api/plan/:id
+// @desc   delete plan
+// @access Private (company)
+planRoutes.delete('/:id', isAuthenticatedCompany, (req, res) => {
+
+    Plan.deleteOne(
+        {
+            _id: req.params.id,
+            company: req.companyId
+        },
+    )
+    .then(result => {
+        response = {result};
+
+        res.status(200).sendJson(response)
+    })
+    .catch(error => {
+        if(error.name === 'CastError'){
+            response = {message: 'Invalid Plan Id'};
+        
+            return res.status(400).sendJson(response);
+        }
+        response = {message: "Internal Server Error"};
+
+        res.status(500).sendError(error, response);
+    });
+});
+
+
 module.exports = planRoutes;
