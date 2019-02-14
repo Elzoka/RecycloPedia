@@ -2,7 +2,7 @@ const planRoutes = require('express').Router();
 
 const Plan = require('../../../models/Plan');
 const isAuthenticatedCompany = require('../../../middlwares/isAuthenticatedCompany');
-const {createPlanObject} = require('../../../lib/plan');
+const {createPlanObject, updatedPlanFields} = require('../../../lib/plan');
 
 
 // @route  POST api/plan 
@@ -111,5 +111,54 @@ planRoutes.get('/:id', (req, res) => {
 });
 
 
+
+// @route  PUT api/plan/:id
+// @desc   update plan
+// @access Private (company)
+planRoutes.put('/:id', isAuthenticatedCompany, async (req, res) => {
+    let response;
+    
+    const {images, ...planObject} = updatedPlanFields(req.body);
+
+    const updateQuery = {};
+    if(images && images.length > 0){
+        updateQuery['$addToSet'] = {images};
+    }
+    if(Object.keys(planObject).length > 0){
+        updateQuery['$set'] = planObject;
+    }
+
+    if(Object.keys(updateQuery).length < 1){
+
+        response = {message: "invalid request"};
+        return res.status(400).sendJson(response)
+    }
+
+    Plan.updateOne(
+        {
+            _id: req.params.id,
+            company: req.companyId
+        },
+        updateQuery,
+        {runValidators: true}
+    )
+    .then(result => {
+        // @TODO add 404 status code for result.n = 0;
+        response = {result};
+
+        res.status(200).sendJson(response);
+    })
+    .catch(error => {
+        if(error.name === 'ValidationError' || error.name === "CastError"){
+            response = {message: "invalid request"};
+
+            return res.status(400).sendJson(response)
+        }
+
+        response = {message: "Internal Server Error"};
+
+        res.status(500).sendError(error, response);
+    })
+});
 
 module.exports = planRoutes;

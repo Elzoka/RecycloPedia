@@ -153,6 +153,13 @@ companyRoutes.put('/', isAuthenticatedCompany, (req, res) => {
 
             return res.status(400).sendJson(response);
         }
+        
+        if(error.name === 'ValidationError' || error.name === "CastError"){
+            response = {message: "invalid request"};
+
+            return res.status(400).sendJson(response)
+        }
+
 
         response = {message: "Internal Server Error"};
 
