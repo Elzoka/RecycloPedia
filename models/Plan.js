@@ -9,7 +9,7 @@ const PlanSchema = new mongoose.Schema({
     },
     company: {
         type: mongoose.Schema.ObjectId,
-        ref: 'request'
+        ref: 'company'
     },
     points: {
         type: Number,

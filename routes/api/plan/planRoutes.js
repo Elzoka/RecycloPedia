@@ -34,4 +34,38 @@ planRoutes.post('/', isAuthenticatedCompany,(req, res) => {
         });
 });
 
+// @route  GET api/plan 
+// @desc   get Plans 
+// @access Public
+
+planRoutes.get('/', (req, res) => {
+    // let statusCode;
+    let response;
+    // @TODO maybe check for category validation
+
+    // validate the company
+    Plan
+        .find({category: req.body.category})
+        .populate({
+            path: 'company',
+            select: 'name logo'
+        })
+        .then(plans => {
+            response = {
+                plans
+            }
+
+            res.status(200).sendJson(response);
+        })
+        .catch(error => {
+            response = {
+                message: 'internal server error'
+            };
+
+            res.status(500).sendError(error, response);            
+        });
+});
+
+
+
 module.exports = planRoutes;
