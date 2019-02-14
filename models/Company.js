@@ -5,6 +5,9 @@ const jwt = require('jsonwebtoken');
 const config = require('../config');
 const AddressSchema = require('./shema/AddressSchema');
 
+// @TODO add a feature that let a company create a poll to create a new category
+// and let other companies vote
+
 const CompanySchema = new mongoose.Schema({ // @TODO add transaction => incoming out going
     name: {
         type: String,
@@ -22,10 +25,6 @@ const CompanySchema = new mongoose.Schema({ // @TODO add transaction => incoming
     }],
     serviceAvailableIn: [{ // @TODO add REST routes when more info available
         type: String
-    }],
-    plans: [{
-        type: mongoose.Schema.ObjectId,
-        ref: 'plan'
     }],
     contactInfo: {
         email: [{ // workEmail
