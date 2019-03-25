@@ -46,13 +46,10 @@ requestRoutes.get('/', isAuthenticatedClient, (req, res) => {
         .find({
             client: req.clientId
         })
+        .select('company points createdAt status')
         .populate({
             path: 'company',
             select: 'name logo'
-        })
-        .populate({
-            path: 'representative',
-            select: 'name pic'
         })
         .sort({createdAt: -1})
         .skip((page - 1) * limit)
@@ -65,6 +62,49 @@ requestRoutes.get('/', isAuthenticatedClient, (req, res) => {
             res.status(200).sendJson(response);
         })
         .catch(error => {
+            response = {
+                message: 'internal server error'
+            };
+
+            res.status(500).sendError(error, response);            
+        });
+});
+
+
+// @route  GET api/client/request/:id 
+// @desc   get request by id
+// @access private (client)
+
+requestRoutes.get('/:id', isAuthenticatedClient,(req, res) => {
+    let response;
+
+    Request
+        .findOne({
+            client: req.clientId,
+            _id: req.params.id
+        })
+        .populate({
+            path: 'company',
+            select: 'name logo rating'
+        })
+        .populate({
+            path: 'representative',
+            select: 'name pic'
+        })
+        .then(request => {
+            response = {
+                request
+            }
+
+            res.status(200).sendJson(response);
+        })
+        .catch(error => {
+            if(error.name === 'CastError'){
+                response = {message: 'Invalid Plan Id'};
+            
+                return res.status(400).sendJson(response);
+            }
+            
             response = {
                 message: 'internal server error'
             };
