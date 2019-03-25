@@ -22,7 +22,7 @@ const RequestSchema = new mongoose.Schema({
     },
     representative: {
         type: mongoose.Schema.ObjectId,
-        ref: 'rep',
+        ref: 'representative',
         default: null
     },
     status: {
@@ -46,4 +46,4 @@ const RequestSchema = new mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('request', RequestSchema)
+module.exports = mongoose.model('request', RequestSchema);
