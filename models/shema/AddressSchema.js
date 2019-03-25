@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const AddressSchema = new mongoose.Schema({
-    country: { // add validation for available countries and cities
+    country: { // @TODO add validation for available countries and cities
         type: String,
         required: true
     },
@@ -9,7 +9,7 @@ const AddressSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    extra: {
+    extra: { // @TODO rename it description
         type: String,
         required: true
     },

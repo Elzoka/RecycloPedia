@@ -3,11 +3,12 @@ const mongoose = require('mongoose');
 const RequestSchema = new mongoose.Schema({
     plan: {
         type: mongoose.Schema.ObjectId,
-        required: true
+        // required: true
+        default: null
     },
-    numberOfItems: {
-        type: Number,
-        default: 1
+    items: { // @TODO replace plan collection with items collection
+        type:[String],
+        minlength: 1,
     },
     client: {
         type: mongoose.Schema.ObjectId,
@@ -22,7 +23,7 @@ const RequestSchema = new mongoose.Schema({
     representative: {
         type: mongoose.Schema.ObjectId,
         ref: 'rep',
-        required: true
+        default: null
     },
     status: {
         type: String,
@@ -30,16 +31,16 @@ const RequestSchema = new mongoose.Schema({
         trim: true,
         lowercase: true,
         default: 'sent'
-    },
+    }, // @TODO add the expected collection date
     createdAt: {
         type: Date,
-        required: true
+        default: new Date()
     },
     fullfilledAt: {
         type: Date,
         default: null
     },
-    points: {
+    points: { // @TODO auto calculate points from items
         type: Number,
         default: 0
     }

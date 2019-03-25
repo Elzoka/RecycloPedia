@@ -15,13 +15,14 @@ const PlanSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    itemName: {
-        type: String,
-        required: true
-    },
     createdAt: {
         type: Date,
         default: Date.now()
+    },
+    // @TODO create an item collection
+    itemName: {
+        type: String,
+        required: true
     },
     description: String,
     images: [String]

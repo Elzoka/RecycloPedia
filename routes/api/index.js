@@ -17,10 +17,12 @@ const companyRoutes = require('./company');
 const clientRoutes = require('./client');
 const repRoutes = require('./rep');
 const planRoutes = require('./plan');
+const requestRoutes = require('./request');
 
 api.use('/company', companyRoutes);
 api.use('/client', clientRoutes);
 api.use('/rep', repRoutes);
 api.use('/plan', planRoutes);
+api.use('/request', requestRoutes);
 
 module.exports = api;
