@@ -49,4 +49,48 @@ requestRoutes.get('/', isAuthenticatedCompany, (req, res) => {
 });
 
 
+// @route  GET api/company/request/:id 
+// @desc   get request by id
+// @access private (company)
+
+requestRoutes.get('/:id', isAuthenticatedCompany,(req, res) => {
+    let response;
+
+    Request
+        .findOne({
+            company: req.companyId,
+            _id: req.params.id
+        })
+        .select('-company')
+        .populate({
+            path: 'client',
+            select: 'name pic rating'
+        })
+        .populate({
+            path: 'representative',
+            select: 'name pic'
+        })
+        .then(request => {
+            response = {
+                request
+            }
+
+            res.status(200).sendJson(response);
+        })
+        .catch(error => {
+            if(error.name === 'CastError'){
+                response = {message: 'Invalid Plan Id'};
+            
+                return res.status(400).sendJson(response);
+            }
+            
+            response = {
+                message: 'internal server error'
+            };
+
+            res.status(500).sendError(error, response);            
+        });
+});
+
+
 module.exports = requestRoutes;

@@ -83,6 +83,7 @@ requestRoutes.get('/:id', isAuthenticatedClient,(req, res) => {
             client: req.clientId,
             _id: req.params.id
         })
+        .select('-client')
         .populate({
             path: 'company',
             select: 'name logo rating'
