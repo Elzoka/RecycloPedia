@@ -2,7 +2,7 @@ const requestRoutes = require('express').Router();
 
 const Request = require('../../../models/Request');
 const isAuthenticatedCompany = require('../../../middlwares/isAuthenticatedCompany');
-
+const {updateRequestStatus} = require('../../../lib/request');
 
 // @route  GET api/company/request
 // @desc   get company requests
@@ -91,6 +91,45 @@ requestRoutes.get('/:id', isAuthenticatedCompany,(req, res) => {
             res.status(500).sendError(error, response);            
         });
 });
+
+
+
+// @route  PUT api/company/request/:id
+// @desc   update request
+// @access Private (company)
+requestRoutes.put('/:id', isAuthenticatedCompany, async (req, res) => {
+    let response;
+    
+    const updatedRequest = updateRequestStatus(req.body);
+    
+    // @TODO check if representative exists and is associated with the company
+    Request.updateOne(
+        {
+            _id: req.params.id,
+            company: req.companyId
+        },
+        {$set: updatedRequest},
+        {runValidators: true}
+    )
+    .then(result => {
+        // @TODO add 404 status code for result.n = 0;
+        response = {result};
+
+        res.status(200).sendJson(response);
+    })
+    .catch(error => {
+        if(error.name === 'ValidationError' || error.name === "CastError"){
+            response = {message: "invalid request"};
+
+            return res.status(400).sendJson(response)
+        }
+
+        response = {message: "Internal Server Error"};
+
+        res.status(500).sendError(error, response);
+    })
+});
+
 
 
 module.exports = requestRoutes;
