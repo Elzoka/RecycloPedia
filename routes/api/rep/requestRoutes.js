@@ -47,4 +47,45 @@ requestRoutes.get('/', isAuthenticatedRep, (req, res) => {
         });
 });
 
+// @route  GET api/rep/request/:id 
+// @desc   get request by id
+// @access private (rep)
+
+requestRoutes.get('/:id', isAuthenticatedRep,(req, res) => {
+    let response;
+
+    Request
+        .findOne({
+            representative: req.repId,
+            _id: req.params.id
+        })
+        .select('-company -representative')
+        .populate({
+            path: 'client',
+            select: 'name pic rating'
+        }) // @TODO populate items
+        .then(request => {
+            response = {
+                request
+            }
+
+            res.status(200).sendJson(response);
+        })
+        .catch(error => {
+            if(error.name === 'CastError'){
+                response = {message: 'Invalid Plan Id'};
+            
+                return res.status(400).sendJson(response);
+            }
+            
+            response = {
+                message: 'internal server error'
+            };
+
+            res.status(500).sendError(error, response);            
+        });
+});
+
+
+
 module.exports = requestRoutes;
