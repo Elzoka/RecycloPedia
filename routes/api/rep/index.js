@@ -1,8 +1,10 @@
 const representative = require('express').Router();
 const repRoutes = require('./repRoutes');
 const authRoutes = require('./authRoutes');
+const requestRoutes = require('./requestRoutes');
 
-// /api/company
+// /api/rep
+representative.use('/request', requestRoutes);
 representative.use('/', authRoutes);
 representative.use('/', repRoutes);
 
