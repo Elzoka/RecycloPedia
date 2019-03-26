@@ -2,7 +2,7 @@ const requestRoutes = require('express').Router();
 
 const Request = require('../../../models/Request');
 const isAuthenticatedClient = require('../../../middlwares/isAuthenticatedClient');
-const {createRequestObj} = require('../../../lib/request');
+const {createRequestObj, updatedItemsFields} = require('../../../lib/request');
 
 // @route  POST api/client/request 
 // @desc   create a new request
@@ -112,6 +112,45 @@ requestRoutes.get('/:id', isAuthenticatedClient,(req, res) => {
             res.status(500).sendError(error, response);            
         });
 });
+
+
+// @route  PUT api/client/request/:id
+// @desc   update request
+// @access Private (client)
+requestRoutes.put('/:id', isAuthenticatedClient, async (req, res) => {
+    let response;
+    
+    const updatedRequest = updatedItemsFields(req.body);
+
+    console.log(updatedRequest);
+    
+    Request.updateOne(
+        {
+            _id: req.params.id,
+            client: req.clientId
+        },
+        {$set: updatedRequest},
+        {runValidators: true}
+    )
+    .then(result => {
+        // @TODO add 404 status code for result.n = 0;
+        response = {result};
+
+        res.status(200).sendJson(response);
+    })
+    .catch(error => {
+        if(error.name === 'ValidationError' || error.name === "CastError"){
+            response = {message: "invalid request"};
+
+            return res.status(400).sendJson(response)
+        }
+
+        response = {message: "Internal Server Error"};
+
+        res.status(500).sendError(error, response);
+    })
+});
+
 
 
 module.exports = requestRoutes;
