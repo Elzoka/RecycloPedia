@@ -11,7 +11,6 @@ const ClientSchema = new mongoose.Schema({
         required: true,
     },
     address: [AddressSchema],
-    // @TODO add a pic
     points: { // @TODO add transaction incoming & outgoing
         type: Number,
         default: 0
@@ -36,12 +35,16 @@ const ClientSchema = new mongoose.Schema({
         required: true
     },
     rating: {
-        type: Number,
+        type: Number, // @TODO calculate rating from requests 
         default: -1 // No rating
     },
     createdAt: {
         type: Date,
         default: Date.now()
+    },
+    pic: {
+        type: String,
+        default: "/client/12" // default it to random logo
     }
 });
 

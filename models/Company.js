@@ -53,7 +53,7 @@ const CompanySchema = new mongoose.Schema({ // @TODO add transaction => incoming
         type: Date,
         default: Date.now()
     },
-    rating: { // @TODO change it to array of objects
+    rating: { // @TODO calculate rating from requests
         type: Number,
         default: -1 // No rating
     }, // @TODO add feedback

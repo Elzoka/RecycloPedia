@@ -12,7 +12,7 @@ requestRoutes.post('/', isAuthenticatedClient, (req, res) => {
     let response;
     // validate request data
     const reqObj = createRequestObj(req.body, req.clientId);
-    Request // @Todo check if the company has the specified items
+    Request // @Todo check if the company exists and has the specified items
         .create(reqObj)
         .then(newReq => {
             response = {request: newReq};

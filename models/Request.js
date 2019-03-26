@@ -44,6 +44,8 @@ const RequestSchema = new mongoose.Schema({
         type: Number,
         default: 0
     }
+
+    // @TODO add rating for each the company and the client
 });
 
 module.exports = mongoose.model('request', RequestSchema);
