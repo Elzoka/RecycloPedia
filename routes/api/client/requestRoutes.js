@@ -118,7 +118,7 @@ requestRoutes.get('/:id', isAuthenticatedClient,(req, res) => {
 // @route  PUT api/client/request/:id
 // @desc   update request
 // @access Private (client)
-requestRoutes.put('/:id', isAuthenticatedClient, async (req, res) => {
+requestRoutes.put('/:id', isAuthenticatedClient, (req, res) => {
     let response;
     
     const updatedRequest = updatedItemsFields(req.body);

@@ -115,7 +115,7 @@ planRoutes.get('/:id', (req, res) => {
 // @route  PUT api/plan/:id
 // @desc   update plan
 // @access Private (company)
-planRoutes.put('/:id', isAuthenticatedCompany, async (req, res) => {
+planRoutes.put('/:id', isAuthenticatedCompany, (req, res) => {
     let response;
     
     const {pushImages, pullImage, ...planObject} = updatedPlanFields(req.body);

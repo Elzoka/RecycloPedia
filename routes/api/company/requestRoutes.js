@@ -97,7 +97,7 @@ requestRoutes.get('/:id', isAuthenticatedCompany,(req, res) => {
 // @route  PUT api/company/request/:id
 // @desc   update request
 // @access Private (company)
-requestRoutes.put('/:id', isAuthenticatedCompany, async (req, res) => {
+requestRoutes.put('/:id', isAuthenticatedCompany, (req, res) => {
     let response;
     
     const updatedRequest = updateRequestStatus(req.body);

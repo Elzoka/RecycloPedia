@@ -88,4 +88,39 @@ requestRoutes.get('/:id', isAuthenticatedRep,(req, res) => {
 
 
 
+// @route  PUT api/rep/request/:id
+// @desc   update request
+// @access Private (rep)
+requestRoutes.put('/:id', isAuthenticatedRep, (req, res) => {
+    let response;
+    
+    Request.updateOne(
+        {
+            _id: req.params.id,
+            representative: req.repId
+        },
+        {$set: {status: "fullfilled"}, $currentDate: {fullfilledAt: true}},
+        {runValidators: true}
+    )
+    .then(result => {
+        // @TODO add 404 status code for result.n = 0;
+        response = {result};
+
+        res.status(200).sendJson(response);
+    })
+    .catch(error => {
+        if(error.name === 'ValidationError' || error.name === "CastError"){
+            response = {message: "invalid request"};
+
+            return res.status(400).sendJson(response)
+        }
+
+        response = {message: "Internal Server Error"};
+
+        res.status(500).sendError(error, response);
+    })
+});
+
+
+
 module.exports = requestRoutes;

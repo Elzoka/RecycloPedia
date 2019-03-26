@@ -48,4 +48,6 @@ const RequestSchema = new mongoose.Schema({
     // @TODO add rating for each the company and the client
 });
 
+// @TODO when fullfilled add request points to client and subtract them from the company 
+
 module.exports = mongoose.model('request', RequestSchema);
