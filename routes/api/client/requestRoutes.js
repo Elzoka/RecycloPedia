@@ -121,8 +121,6 @@ requestRoutes.put('/:id', isAuthenticatedClient, async (req, res) => {
     let response;
     
     const updatedRequest = updatedItemsFields(req.body);
-
-    console.log(updatedRequest);
     
     Request.updateOne(
         {
@@ -149,6 +147,35 @@ requestRoutes.put('/:id', isAuthenticatedClient, async (req, res) => {
 
         res.status(500).sendError(error, response);
     })
+});
+
+// @route  DELETE api/client/request/:id
+// @desc   delete a request if not assigned
+// @access Private (client)
+requestRoutes.delete('/:id', isAuthenticatedClient, (req, res) => {
+
+    Request.deleteOne(
+        {
+            _id: req.params.id,
+            client: req.clientId,
+            status: {$nin: ['assigned', 'fullfilled']}
+        },
+    )
+    .then(result => {
+        response = {result};
+
+        res.status(200).sendJson(response)
+    })
+    .catch(error => {
+        if(error.name === 'CastError'){
+            response = {message: 'Invalid Plan Id'};
+        
+            return res.status(400).sendJson(response);
+        }
+        response = {message: "Internal Server Error"};
+
+        res.status(500).sendError(error, response);
+    });
 });
 
 

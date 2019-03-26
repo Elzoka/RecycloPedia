@@ -19,10 +19,6 @@ const CompanySchema = new mongoose.Schema({ // @TODO add transaction => incoming
         type: Number,
         default: 0
     },
-    requests: [{
-        type: mongoose.Schema.ObjectId,
-        ref: 'request'
-    }],
     serviceAvailableIn: [{ // @TODO add REST routes when more info available
         type: String
     }],
