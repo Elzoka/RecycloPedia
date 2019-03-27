@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const categories = require('./config/categories.json');
 // @TODO add routes for categories for the admins
 
-const PlanSchema = new mongoose.Schema({
+const ItemSchema = new mongoose.Schema({
     category: {
         type: String,
         enum: categories
@@ -19,13 +19,13 @@ const PlanSchema = new mongoose.Schema({
         type: Date,
         default: Date.now()
     },
-    // @TODO create an item collection
-    itemName: {
+    name: {
         type: String,
         required: true
     },
     description: String,
-    images: [String]
+    images: [String] //@TODO add limit to images
+    // @TODO add item main image or something
 });
 
-module.exports = mongoose.model('plan', PlanSchema);
+module.exports = mongoose.model('item', ItemSchema);

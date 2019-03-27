@@ -1,14 +1,17 @@
 const mongoose = require('mongoose');
 
 const RequestSchema = new mongoose.Schema({
-    plan: {
-        type: mongoose.Schema.ObjectId,
-        // required: true
-        default: null
-    },
-    items: { // @TODO replace plan collection with items collection
-        type:[String],
+    items: {
+        type:[{
+            id:{
+                type: mongoose.Schema.ObjectId,
+                ref: 'item'
+            },
+            quantity: Number,
+            _id: false
+        }],
         minlength: 1,
+        maxlength: 10 // @TODO could change it later
     },
     client: {
         type: mongoose.Schema.ObjectId,
@@ -31,7 +34,7 @@ const RequestSchema = new mongoose.Schema({
         trim: true,
         lowercase: true,
         default: 'sent'
-    }, // @TODO add the expected collection date
+    }, // @TODO add the expected fullfillment date
     createdAt: {
         type: Date,
         default: new Date()

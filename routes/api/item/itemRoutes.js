@@ -1,25 +1,25 @@
-const planRoutes = require('express').Router();
+const itemRoutes = require('express').Router();
 
-const Plan = require('../../../models/Plan');
+const Item = require('../../../models/Item');
 const isAuthenticatedCompany = require('../../../middlwares/isAuthenticatedCompany');
-const {createPlanObject, updatedPlanFields} = require('../../../lib/plan');
+const {createItemObject, updatedItemFields} = require('../../../lib/item');
 
 
-// @route  POST api/plan 
-// @desc   Create new Plan 
+// @route  POST api/item 
+// @desc   Create new item 
 // @access Private (company)
 
-planRoutes.post('/', isAuthenticatedCompany,(req, res) => {
+itemRoutes.post('/', isAuthenticatedCompany,(req, res) => {
     let response;
-    const planObject = createPlanObject(req.body, req.companyId);
+    const itemObject = createItemObject(req.body, req.companyId);
 
     // validate the company
-    Plan
-        .create(planObject)
-        .then(plan => {
-            // @TODO send a success message instead of the saved plan
+    Item
+        .create(itemObject)
+        .then(item => {
+            // @TODO send a success message instead of the saved item
             response = {
-                plan
+                item
             }
 
             res.status(200).sendJson(response);
@@ -33,11 +33,11 @@ planRoutes.post('/', isAuthenticatedCompany,(req, res) => {
         });
 });
 
-// @route  GET api/plan 
-// @desc   get Plans 
+// @route  GET api/item 
+// @desc   get items 
 // @access Public
 
-planRoutes.get('/', (req, res) => {
+itemRoutes.get('/', (req, res) => {
     let response;
 
     // pagination
@@ -47,7 +47,7 @@ planRoutes.get('/', (req, res) => {
     // @TODO maybe check for category validation
 
     // validate the company
-    Plan
+    Item
         .find({category: req.body.category})
         .populate({
             path: 'company',
@@ -56,9 +56,9 @@ planRoutes.get('/', (req, res) => {
         .sort({points: -1})
         .skip((page - 1) * limit)
         .limit(limit)
-        .then(plans => {
+        .then(items => {
             response = {
-                plans
+                items
             }
 
             res.status(200).sendJson(response);
@@ -72,15 +72,15 @@ planRoutes.get('/', (req, res) => {
         });
 });
 
-// @route  GET api/plan/:id 
-// @desc   get Plans 
+// @route  GET api/item/:id 
+// @desc   get items 
 // @access Public
 
-planRoutes.get('/:id', (req, res) => {
+itemRoutes.get('/:id', (req, res) => {
     let response;
 
     // validate the company
-    Plan
+    Item
         .findOne({
             _id: req.params.id
         })
@@ -88,16 +88,16 @@ planRoutes.get('/:id', (req, res) => {
             path: 'company',
             select: 'name logo rating'
         })
-        .then(plan => {
+        .then(item => {
             response = {
-                plan
+                item
             }
 
             res.status(200).sendJson(response);
         })
         .catch(error => {
             if(error.name === 'CastError'){
-                response = {message: 'Invalid Plan Id'};
+                response = {message: 'Invalid item Id'};
             
                 return res.status(400).sendJson(response);
             }
@@ -112,13 +112,13 @@ planRoutes.get('/:id', (req, res) => {
 
 
 
-// @route  PUT api/plan/:id
-// @desc   update plan
+// @route  PUT api/item/:id
+// @desc   update item
 // @access Private (company)
-planRoutes.put('/:id', isAuthenticatedCompany, (req, res) => {
+itemRoutes.put('/:id', isAuthenticatedCompany, (req, res) => {
     let response;
     
-    const {pushImages, pullImage, ...planObject} = updatedPlanFields(req.body);
+    const {pushImages, pullImage, ...itemObject} = updatedItemFields(req.body);
 
     const updateQuery = {};
     if(pushImages && pushImages.length > 0){
@@ -127,8 +127,8 @@ planRoutes.put('/:id', isAuthenticatedCompany, (req, res) => {
         updateQuery['$pull'] = {images: pullImage};
     }
 
-    if(Object.keys(planObject).length > 0){
-        updateQuery['$set'] = planObject;
+    if(Object.keys(itemObject).length > 0){
+        updateQuery['$set'] = itemObject;
     }
 
     if(Object.keys(updateQuery).length < 1){
@@ -137,7 +137,7 @@ planRoutes.put('/:id', isAuthenticatedCompany, (req, res) => {
         return res.status(400).sendJson(response)
     }
 
-    Plan.updateOne(
+    Item.updateOne(
         {
             _id: req.params.id,
             company: req.companyId
@@ -164,12 +164,12 @@ planRoutes.put('/:id', isAuthenticatedCompany, (req, res) => {
     })
 });
 
-// @route  DELETE api/plan/:id
-// @desc   delete plan
+// @route  DELETE api/item/:id
+// @desc   delete item
 // @access Private (company)
-planRoutes.delete('/:id', isAuthenticatedCompany, (req, res) => {
+itemRoutes.delete('/:id', isAuthenticatedCompany, (req, res) => {
 
-    Plan.deleteOne(
+    Item.deleteOne(
         {
             _id: req.params.id,
             company: req.companyId
@@ -182,7 +182,7 @@ planRoutes.delete('/:id', isAuthenticatedCompany, (req, res) => {
     })
     .catch(error => {
         if(error.name === 'CastError'){
-            response = {message: 'Invalid Plan Id'};
+            response = {message: 'Invalid item Id'};
         
             return res.status(400).sendJson(response);
         }
@@ -192,4 +192,4 @@ planRoutes.delete('/:id', isAuthenticatedCompany, (req, res) => {
     });
 });
 
-module.exports = planRoutes;
+module.exports = itemRoutes;

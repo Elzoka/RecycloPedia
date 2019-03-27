@@ -1,6 +1,7 @@
 const requestRoutes = require('express').Router();
 
 const Request = require('../../../models/Request');
+const Item = require('../../../models/Item');
 const isAuthenticatedClient = require('../../../middlwares/isAuthenticatedClient');
 const {createRequestObj, updatedItemsFields} = require('../../../lib/request');
 
@@ -12,23 +13,60 @@ requestRoutes.post('/', isAuthenticatedClient, (req, res) => {
     let response;
     // validate request data
     const reqObj = createRequestObj(req.body, req.clientId);
-    Request // @Todo check if the company exists and has the specified items
-        .create(reqObj)
-        .then(newReq => {
-            response = {request: newReq};
-            res.status(200).sendJson(response);
+    const itemsIds = reqObj.items.map(item => item.id);
 
-        })
-        .catch(error => {
-            response = {
-                auth: false,
-                message: 'invalid data'
-            };
+    // check if the company exist and contains the specified items
+    // if items returned then we trust that this company exists and has the filtered ids
+    Item.find({
+        _id: {$in: itemsIds},
+        company: reqObj.company 
+    },{
+        _id: 1,
+        company: 1
+    })
+    .then(trustedItems => {
+        if(trustedItems.length < 1){
+            response = {message: 'invalid data'};
+            return res.status(400).sendJson(response);
 
-            // @Todo handle errors better && log error object
+        }
+        const trustedIds = trustedItems.map(item => item._id.toHexString());
 
-            res.status(400).sendJson(response);
-        });
+        // validate items
+        reqObj.items = reqObj.items.filter(item => trustedIds.includes(item.id));
+        reqObj.company = trustedItems[0].company; // any item company id will be the same
+        reqObj.client = req.clientId;
+        
+        Request
+            .create(reqObj)
+            .then(newReq => {
+                response = {request: newReq};
+                res.status(200).sendJson(response);
+
+            })
+            .catch(error => {
+                response = {
+                    message: 'invalid data'
+                };
+
+                // @Todo handle errors better && log error object
+
+                res.status(400).sendJson(response);
+            });
+    })
+    .catch(error => {
+        if(error.name === 'CastError'){
+            response = {message: 'Invalid company or item Id'};
+        
+            return res.status(400).sendJson(response);
+        }
+        
+        response = {
+            message: 'internal server error'
+        };
+
+        res.status(500).sendError(error, response);       
+    });
 });
 
 // @route  GET api/client/request
@@ -66,7 +104,7 @@ requestRoutes.get('/', isAuthenticatedClient, (req, res) => {
                 message: 'internal server error'
             };
 
-            res.status(500).sendError(error, response);            
+            res.status(500).sendError(error, response);  
         });
 });
 
@@ -101,7 +139,7 @@ requestRoutes.get('/:id', isAuthenticatedClient,(req, res) => {
         })
         .catch(error => {
             if(error.name === 'CastError'){
-                response = {message: 'Invalid Plan Id'};
+                response = {message: 'Invalid Request Id'};
             
                 return res.status(400).sendJson(response);
             }
@@ -121,32 +159,80 @@ requestRoutes.get('/:id', isAuthenticatedClient,(req, res) => {
 requestRoutes.put('/:id', isAuthenticatedClient, (req, res) => {
     let response;
     
-    const updatedRequest = updatedItemsFields(req.body);
-    
-    Request.updateOne(
-        {
-            _id: req.params.id,
-            client: req.clientId
-        },
-        {$set: updatedRequest},
-        {runValidators: true}
-    )
-    .then(result => {
-        // @TODO add 404 status code for result.n = 0;
-        response = {result};
+    const reqObj = updatedItemsFields(req.body);
 
-        res.status(200).sendJson(response);
+    const itemsIds = reqObj.items.map(item => item.id);
+
+    // check specified items exists
+    Item.find({
+        _id: {$in: itemsIds}
+    },{
+        _id: 1,
+        company: 1
+    })
+    .then(trustedItems => {
+        if(trustedItems.length < 1){
+            response = {message: 'invalid data'};
+            return res.status(400).sendJson(response);
+        }
+        // any company id should work just fine cause all items should be form the same company
+        const companyId = trustedItems[0].company;
+        const trustedIds = trustedItems.map(item => {
+            // check if each item has the same company to validate the previous assumption
+            if(companyId && item.company !== companyId){
+                companyId = null;
+            }
+
+            return item._id.toHexString()
+        });
+
+
+        // validate items
+        reqObj.items = reqObj.items.filter(item => trustedIds.includes(item.id));
+        
+
+        // update only the request that macthes this three criteria _id, client, status and company provided
+        Request.updateOne(
+            {
+                _id: req.params.id,
+                client: req.clientId,
+                company: companyId,
+                status: 'sent'
+            },
+            {$set: reqObj}, // @TODO remove set and add push and pull to query for more efficiancy
+            {runValidators: true}
+        )
+        .then(result => {
+            // @TODO add 404 status code for result.n = 0;
+            response = {result};
+
+            res.status(200).sendJson(response);
+        })
+        .catch(error => {
+            if(error.name === 'ValidationError' || error.name === "CastError"){
+                console.log(error.message);
+                response = {message: "invalid request"};
+
+                return res.status(400).sendJson(response)
+            }
+
+            response = {message: "Internal Server Error"};
+
+            res.status(500).sendError(error, response);
+        });
     })
     .catch(error => {
-        if(error.name === 'ValidationError' || error.name === "CastError"){
-            response = {message: "invalid request"};
-
-            return res.status(400).sendJson(response)
+        if(error.name === 'CastError'){
+            response = {message: 'Invalid item Id'};
+        
+            return res.status(400).sendJson(response);
         }
+        
+        response = {
+            message: 'internal server error'
+        };
 
-        response = {message: "Internal Server Error"};
-
-        res.status(500).sendError(error, response);
+        res.status(500).sendError(error, response);       
     })
 });
 
@@ -169,7 +255,7 @@ requestRoutes.delete('/:id', isAuthenticatedClient, (req, res) => {
     })
     .catch(error => {
         if(error.name === 'CastError'){
-            response = {message: 'Invalid Plan Id'};
+            response = {message: 'Invalid Request Id'};
         
             return res.status(400).sendJson(response);
         }

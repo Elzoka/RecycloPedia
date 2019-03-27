@@ -17,7 +17,9 @@ requestRoutes.get('/', isAuthenticatedRep, (req, res) => {
     // create query object
     const query = {
         representative: req.repId,
-        status: ['assigned', 'fullfilled'].includes(req.query.status) ? req.query.status : 'assigned'
+    }
+    if(req.query.status && ['assigned', 'fullfilled'].includes(req.query.status)){
+        query.status = req.query.status;
     }
     
     // @TODO add various sorting and filters
@@ -53,7 +55,7 @@ requestRoutes.get('/', isAuthenticatedRep, (req, res) => {
 
 requestRoutes.get('/:id', isAuthenticatedRep,(req, res) => {
     let response;
-
+    console.log(req.repId);
     Request
         .findOne({
             representative: req.repId,
@@ -63,7 +65,11 @@ requestRoutes.get('/:id', isAuthenticatedRep,(req, res) => {
         .populate({
             path: 'client',
             select: 'name pic rating'
-        }) // @TODO populate items
+        })
+        .populate({
+            path: 'items.id',
+            select: 'createdAt name points images' // @TODO replace images with item logo or main image
+        })
         .then(request => {
             response = {
                 request
@@ -73,7 +79,7 @@ requestRoutes.get('/:id', isAuthenticatedRep,(req, res) => {
         })
         .catch(error => {
             if(error.name === 'CastError'){
-                response = {message: 'Invalid Plan Id'};
+                response = {message: 'Invalid Request Id'};
             
                 return res.status(400).sendJson(response);
             }
