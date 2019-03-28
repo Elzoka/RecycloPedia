@@ -1,6 +1,8 @@
 const requestRoutes = require('express').Router();
 
 const Request = require('../../../models/Request');
+const Company = require('../../../models/Company');
+const Client = require('../../../models/Client');
 const isAuthenticatedRep = require('../../../middlwares/isAuthenticatedRep');
 
 // @route  GET api/rep/request
@@ -55,7 +57,7 @@ requestRoutes.get('/', isAuthenticatedRep, (req, res) => {
 
 requestRoutes.get('/:id', isAuthenticatedRep,(req, res) => {
     let response;
-    console.log(req.repId);
+    
     Request
         .findOne({
             representative: req.repId,
@@ -99,32 +101,64 @@ requestRoutes.get('/:id', isAuthenticatedRep,(req, res) => {
 // @access Private (rep)
 requestRoutes.put('/:id', isAuthenticatedRep, (req, res) => {
     let response;
-    
-    Request.updateOne(
-        {
+
+    // @TODO when fullfilled add request points to client and subtract them from the company 
+    console.log(req.repId);
+    Request.
+        findOne({
             _id: req.params.id,
-            representative: req.repId
-        },
-        {$set: {status: "fullfilled"}, $currentDate: {fullfilledAt: true}},
-        {runValidators: true}
-    )
-    .then(result => {
-        // @TODO add 404 status code for result.n = 0;
-        response = {result};
+            representative: req.repId,
+            status: 'assigned'
+        },{
+            representative: 1,
+            company: 1,
+            points: 1,
+            client: 1
+        }).then(dbRequest => {
 
-        res.status(200).sendJson(response);
-    })
-    .catch(error => {
-        if(error.name === 'ValidationError' || error.name === "CastError"){
-            response = {message: "invalid request"};
+            if(!dbRequest){
+                response = {message: 'Invalid request id'};
+    
+                return res.status(400).sendJson(response);
+            }
 
-            return res.status(400).sendJson(response)
-        }
+            let session = null;
 
-        response = {message: "Internal Server Error"};
+            Request.db.startSession()
+            .then(_session => {
+                session = _session;
+                session.startTransaction();
+    
+                return Request.updateOne(
+                    {
+                        _id: dbRequest._id,
+                        representative: dbRequest.representative
+                    },
+                    {$set: {status: "fullfilled"}, $currentDate: {fullfilledAt: true}},
+                    {runValidators: true, session}
+                )
+            }) // @TODO check if the company has enough point to  maske the transaction
+            .then(() => Company.updateOne({_id: dbRequest.company}, {$inc: {points: -1 * dbRequest.points}}, {session}))
+            .then(() => Client.updateOne({ _id: dbRequest.client }, {$inc: {points: dbRequest.points}},{session}))
+            .then(() => session.commitTransaction())
+            .then((doc) => {
+                // @TODO add 404 status code for result.n = 0;
+                response = {ok: doc.ok};
 
-        res.status(500).sendError(error, response);
-    })
+                res.status(200).sendJson({response});
+            })
+        })
+        .catch(error => {
+            if(error.name === 'ValidationError' || error.name === "CastError"){
+                response = {message: "invalid request"};
+    
+                return res.status(400).sendJson(response)
+            }
+    
+            response = {message: "Internal Server Error"};
+    
+            res.status(500).sendError(error, response);
+        })
 });
 
 

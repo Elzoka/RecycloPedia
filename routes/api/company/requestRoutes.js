@@ -134,7 +134,6 @@ requestRoutes.put('/:id', isAuthenticatedCompany, async (req, res) => {
             updatedFields.representative = representative._id;
 
         }
-        console.log(query, updatedFields);
         const result = await Request.updateOne(query, updatedFields, {runValidators: true});
 
         // @TODO add 404 status code for result.n = 0;

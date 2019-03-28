@@ -7,6 +7,7 @@ const RequestSchema = new mongoose.Schema({
                 type: mongoose.Schema.ObjectId,
                 ref: 'item'
             },
+            points: Number,
             quantity: Number,
             _id: false
         }],
@@ -43,7 +44,7 @@ const RequestSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
-    points: { // @TODO auto calculate points from items
+    points: {
         type: Number,
         default: 0
     }
@@ -51,6 +52,15 @@ const RequestSchema = new mongoose.Schema({
     // @TODO add rating for each the company and the client
 });
 
-// @TODO when fullfilled add request points to client and subtract them from the company 
+// @TODO modify the reponse in POST routes to return a smarter response and less data (not the whole created object)
+
+RequestSchema.pre('save', function (next) {
+    if(!this.isModified('items')){
+        return next();
+    }
+    this.points = this.items.reduce((total, item) => total + item.points * item.quantity, 0);
+    next();
+});
+
 
 module.exports = mongoose.model('request', RequestSchema);

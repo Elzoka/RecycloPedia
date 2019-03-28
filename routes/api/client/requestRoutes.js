@@ -12,8 +12,15 @@ const {createRequestObj, updatedItemsFields} = require('../../../lib/request');
 requestRoutes.post('/', isAuthenticatedClient, (req, res) => {
     let response;
     // validate request data
-    const reqObj = createRequestObj(req.body, req.clientId);
-    const itemsIds = reqObj.items.map(item => item.id);
+    const reqObj = createRequestObj(req.body);
+
+    // make the item ids as keys
+    const providedItems = {};
+    const itemsIds = [];
+    reqObj.items.forEach(item => {
+        providedItems[item.id] = item;
+        itemsIds.push(item.id);
+    });
 
     // check if the company exist and contains the specified items
     // if items returned then we trust that this company exists and has the filtered ids
@@ -22,7 +29,8 @@ requestRoutes.post('/', isAuthenticatedClient, (req, res) => {
         company: reqObj.company 
     },{
         _id: 1,
-        company: 1
+        company: 1,
+        points: 1
     })
     .then(trustedItems => {
         if(trustedItems.length < 1){
@@ -30,10 +38,13 @@ requestRoutes.post('/', isAuthenticatedClient, (req, res) => {
             return res.status(400).sendJson(response);
 
         }
-        const trustedIds = trustedItems.map(item => item._id.toHexString());
 
-        // validate items
-        reqObj.items = reqObj.items.filter(item => trustedIds.includes(item.id));
+        reqObj.items = trustedItems.map(item => ({
+            id: item._id,
+            points: item.points,
+            quantity: providedItems[item._id].quantity
+        }));
+
         reqObj.company = trustedItems[0].company; // any item company id will be the same
         reqObj.client = req.clientId;
         
@@ -161,35 +172,47 @@ requestRoutes.put('/:id', isAuthenticatedClient, (req, res) => {
     
     const reqObj = updatedItemsFields(req.body);
 
-    const itemsIds = reqObj.items.map(item => item.id);
-
+    // make the item ids as keys
+    const providedItems = {};
+    const itemsIds = [];
+    reqObj.items.forEach(item => {
+        providedItems[item.id] = item;
+        itemsIds.push(item.id);
+    });
+    
     // check specified items exists
     Item.find({
         _id: {$in: itemsIds}
     },{
         _id: 1,
-        company: 1
+        company: 1,
+        points: 1
     })
     .then(trustedItems => {
         if(trustedItems.length < 1){
             response = {message: 'invalid data'};
             return res.status(400).sendJson(response);
         }
+        
+        // validate items
+
         // any company id should work just fine cause all items should be form the same company
         const companyId = trustedItems[0].company;
-        const trustedIds = trustedItems.map(item => {
+        let total = 0;
+        reqObj.items = trustedItems.map(item => {
             // check if each item has the same company to validate the previous assumption
             if(companyId && item.company !== companyId){
                 companyId = null;
             }
-
-            return item._id.toHexString()
+            // @TODO when change to pull and push items change update fields to $inc points
+            const quantity = providedItems[item._id].quantity;
+            total += item.points * quantity;
+            return {
+                id: item._id,
+                points: item.points,
+                quantity
+            }
         });
-
-
-        // validate items
-        reqObj.items = reqObj.items.filter(item => trustedIds.includes(item.id));
-        
 
         // update only the request that macthes this three criteria _id, client, status and company provided
         Request.updateOne(
@@ -199,7 +222,7 @@ requestRoutes.put('/:id', isAuthenticatedClient, (req, res) => {
                 company: companyId,
                 status: 'sent'
             },
-            {$set: reqObj}, // @TODO remove set and add push and pull to query for more efficiancy
+            {$set: reqObj, points: total}, // @TODO remove set and add push and pull to query for more efficiancy
             {runValidators: true}
         )
         .then(result => {
@@ -210,7 +233,6 @@ requestRoutes.put('/:id', isAuthenticatedClient, (req, res) => {
         })
         .catch(error => {
             if(error.name === 'ValidationError' || error.name === "CastError"){
-                console.log(error.message);
                 response = {message: "invalid request"};
 
                 return res.status(400).sendJson(response)

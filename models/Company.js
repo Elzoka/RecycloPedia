@@ -15,7 +15,7 @@ const CompanySchema = new mongoose.Schema({ // @TODO add transaction => incoming
         maxlength: 30
     },
     address: [AddressSchema],
-    points: {
+    points: { // @TODO check if the availabe point are enough for each assigned request
         type: Number,
         default: 0
     },
