@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const validator = require('validator');
 
 const config = require('../config');
 const AddressSchema = require('./shema/AddressSchema');
@@ -28,7 +29,11 @@ const ClientSchema = new mongoose.Schema({
         trim: true,
         lowercase: true,
         unique: true,
-        required: true
+        required: true,
+        validate: {
+            validator:validator.isEmail,
+            message: props => `${props.value} is not a valid email`
+        }
     },
     password: {
         type: String,

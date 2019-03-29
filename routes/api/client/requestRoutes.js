@@ -4,6 +4,8 @@ const Request = require('../../../models/Request');
 const Item = require('../../../models/Item');
 const isAuthenticatedClient = require('../../../middlwares/isAuthenticatedClient');
 const {createRequestObj, updatedItemsFields} = require('../../../lib/request');
+const {createErrorObject} = require('../../../lib/errors');
+
 
 // @route  POST api/client/request 
 // @desc   create a new request
@@ -55,28 +57,34 @@ requestRoutes.post('/', isAuthenticatedClient, (req, res) => {
                 res.status(200).sendJson(response);
 
             })
-            .catch(error => {
-                response = {
-                    message: 'invalid data'
-                };
+            // .catch(error => {
+            //     const errorObject = createErrorObject(error);
+            //     res.status(errorObject.status).sendJson(errorObject.response);
+            
+            //     // response = {
+            //     //     message: 'invalid data'
+            //     // };
 
-                // @Todo handle errors better && log error object
+            //     // // @Todo handle errors better && log error object
 
-                res.status(400).sendJson(response);
-            });
+            //     // res.status(400).sendJson(response);
+            // });
     })
     .catch(error => {
-        if(error.name === 'CastError'){
-            response = {message: 'Invalid company or item Id'};
+        errorObject = createErrorObject(error);
+        res.status(errorObject.status).sendJson(errorObject.response);
+                    
+        // if(error.name === 'CastError'){
+        //     response = {message: 'Invalid company or item Id'};
         
-            return res.status(400).sendJson(response);
-        }
+        //     return res.status(400).sendJson(response);
+        // }
         
-        response = {
-            message: 'internal server error'
-        };
+        // response = {
+        //     message: 'internal server error'
+        // };
 
-        res.status(500).sendError(error, response);       
+        // res.status(500).sendError(error, response);       
     });
 });
 
@@ -111,11 +119,14 @@ requestRoutes.get('/', isAuthenticatedClient, (req, res) => {
             res.status(200).sendJson(response);
         })
         .catch(error => {
-            response = {
-                message: 'internal server error'
-            };
+            const errorObject = createErrorObject(error);
+            res.status(errorObject.status).sendJson(errorObject.response);
+                    
+            // response = {
+            //     message: 'internal server error'
+            // };
 
-            res.status(500).sendError(error, response);  
+            // res.status(500).sendError(error, response);  
         });
 });
 
@@ -149,17 +160,20 @@ requestRoutes.get('/:id', isAuthenticatedClient,(req, res) => {
             res.status(200).sendJson(response);
         })
         .catch(error => {
-            if(error.name === 'CastError'){
-                response = {message: 'Invalid Request Id'};
+            const errorObject = createErrorObject(error);
+            res.status(errorObject.status).sendJson(errorObject.response);
             
-                return res.status(400).sendJson(response);
-            }
+            // if(error.name === 'CastError'){
+            //     response = {message: 'Invalid Request Id'};
             
-            response = {
-                message: 'internal server error'
-            };
+            //     return res.status(400).sendJson(response);
+            // }
+            
+            // response = {
+            //     message: 'internal server error'
+            // };
 
-            res.status(500).sendError(error, response);            
+            // res.status(500).sendError(error, response);            
         });
 });
 
@@ -231,30 +245,36 @@ requestRoutes.put('/:id', isAuthenticatedClient, (req, res) => {
 
             res.status(200).sendJson(response);
         })
-        .catch(error => {
-            if(error.name === 'ValidationError' || error.name === "CastError"){
-                response = {message: "invalid request"};
+        // .catch(error => {
+        //     const errorObject = createErrorObject(error);
+        //     res.status(errorObject.status).sendJson(errorObject.response);
+            
+        //     // if(error.name === 'ValidationError' || error.name === "CastError"){
+        //     //     response = {message: "invalid request"};
 
-                return res.status(400).sendJson(response)
-            }
+        //     //     return res.status(400).sendJson(response)
+        //     // }
 
-            response = {message: "Internal Server Error"};
+        //     // response = {message: "Internal Server Error"};
 
-            res.status(500).sendError(error, response);
-        });
+        //     // res.status(500).sendError(error, response);
+        // });
     })
     .catch(error => {
-        if(error.name === 'CastError'){
-            response = {message: 'Invalid item Id'};
+        const errorObject = createErrorObject(error);
+        res.status(errorObject.status).sendJson(errorObject.response);
+            
+        // if(error.name === 'CastError'){
+        //     response = {message: 'Invalid item Id'};
         
-            return res.status(400).sendJson(response);
-        }
+        //     return res.status(400).sendJson(response);
+        // }
         
-        response = {
-            message: 'internal server error'
-        };
+        // response = {
+        //     message: 'internal server error'
+        // };
 
-        res.status(500).sendError(error, response);       
+        // res.status(500).sendError(error, response);       
     })
 });
 
@@ -276,14 +296,17 @@ requestRoutes.delete('/:id', isAuthenticatedClient, (req, res) => {
         res.status(200).sendJson(response)
     })
     .catch(error => {
-        if(error.name === 'CastError'){
-            response = {message: 'Invalid Request Id'};
+        const errorObject = createErrorObject(error);
+        res.status(errorObject.status).sendJson(errorObject.response);
+            
+        // if(error.name === 'CastError'){
+        //     response = {message: 'Invalid Request Id'};
         
-            return res.status(400).sendJson(response);
-        }
-        response = {message: "Internal Server Error"};
+        //     return res.status(400).sendJson(response);
+        // }
+        // response = {message: "Internal Server Error"};
 
-        res.status(500).sendError(error, response);
+        // res.status(500).sendError(error, response);
     });
 });
 

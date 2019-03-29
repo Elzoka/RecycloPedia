@@ -2,6 +2,7 @@ const companyRoutes = require('express').Router();
 
 const Company = require('../../../models/Company');
 const {createCompanyObject, updatedCompanyFields} = require('../../../lib/company');
+const {createErrorObject} = require('../../../lib/errors');
 const isAuthenticatedCompany = require('../../../middlwares/isAuthenticatedCompany');
 
 // @@@@@ TODO ===>  ADD SUITABLE ERROR MESSAGES
@@ -25,32 +26,38 @@ companyRoutes.post('/', (req, res) => {
 
                     res.status(200).sendJson(response);
                 })
-                .catch(error => {
-                    response = {
-                        auth: false,
-                        message: 'internal server error'
-                    };
+                // .catch(error => {
+                //     const errorObject = createErrorObject(error, true);
+                //     res.status(errorObject.status).sendJson(errorObject.response);
+            
+                //     // response = {
+                //     //     auth: false,
+                //     //     message: 'internal server error'
+                //     // };
 
-                    res.status(500).sendError(error, response);
-                });
+                //     // res.status(500).sendError(error, response);
+                // });
         })
         .catch(error => {
-            // code 11000 refers to duplicate key in email index
-            if(error.name === 'MongoError' && error.code === 11000){
-                response = {
-                    auth: false,
-                    message: 'email already exists'
-                };
+            // // code 11000 refers to duplicate key in email index
+            // if(error.name === 'MongoError' && error.code === 11000){
+            //     response = {
+            //         auth: false,
+            //         message: 'email already exists'
+            //     };
 
-                return res.status(400).sendJson(response);
-            }
+            //     return res.status(400).sendJson(response);
+            // }
 
-            response = {
-                auth: false,
-                message: 'invalid data'
-            };
+            // response = {
+            //     auth: false,
+            //     message: 'invalid data'
+            // };
 
-            res.status(400).sendJson(response);            
+            // res.status(400).sendJson(response);
+            const errorObject = createErrorObject(error, true);
+            res.status(errorObject.status).sendJson(errorObject.response);
+            
         });
 });
 
@@ -79,9 +86,12 @@ companyRoutes.get('/', (req, res) => {
         res.status(200).sendJson(response);
     })
     .catch(error => {
-        response = {message: 'Internal Server error'};
+        const errorObject = createErrorObject(error);
+        res.status(errorObject.status).sendJson(errorObject.response);
+            
+        // response = {message: 'Internal Server error'};
 
-        res.status(500).sendError(error, response);
+        // res.status(500).sendError(error, response);
     })
 });
 
@@ -113,14 +123,17 @@ companyRoutes.get('/:id', (req, res) => {
         res.status(200).sendJson(response);
     })
     .catch(error => {
-        if(error.name === 'CastError'){
-            response = {message: 'Invalid Company Id'};
+        const errorObject = createErrorObject(error);
+        res.status(errorObject.status).sendJson(errorObject.response);
+            
+        // if(error.name === 'CastError'){
+        //     response = {message: 'Invalid Company Id'};
         
-            return res.status(400).sendJson(response);
-        }
+        //     return res.status(400).sendJson(response);
+        // }
         
-        response = {message: 'internal server error'};
-        res.status(500).sendError(error ,response);
+        // response = {message: 'internal server error'};
+        // res.status(500).sendError(error ,response);
     })
 });
 
@@ -145,18 +158,21 @@ companyRoutes.put('/', isAuthenticatedCompany, (req, res) => {
         res.status(200).sendJson(response);
     })
     .catch(error => {
-        // code 11000 refers to duplicate key in email index
-        if(error.name === 'MongoError' && error.code === 11000){
-            response = {
-                message: 'email already exists'
-            };
+        const errorObject = createErrorObject(error);
+        res.status(errorObject.status).sendJson(errorObject.response);
+            
+        // // code 11000 refers to duplicate key in email index
+        // if(error.name === 'MongoError' && error.code === 11000){
+        //     response = {
+        //         message: 'email already exists'
+        //     };
 
-            return res.status(400).sendJson(response);
-        }
+        //     return res.status(400).sendJson(response);
+        // }
         
-        response = {message: "Internal Server Error"};
+        // response = {message: "Internal Server Error"};
 
-        res.status(500).sendError(error, response);
+        // res.status(500).sendError(error, response);
     })
 });
 
@@ -176,9 +192,13 @@ companyRoutes.delete('/', isAuthenticatedCompany, (req, res) => {
         res.status(200).sendJson(response)
     })
     .catch(error => {
-        response = {message: "Internal Server Error"};
+        // response = {message: "Internal Server Error"};
 
-        res.status(500).sendError(error, response);
+        // res.status(500).sendError(error, response);
+
+        const errorObject = createErrorObject(error);
+        res.status(errorObject.status).sendJson(errorObject.response);
+            
     });
 });
 

@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 const Client = require('../models/Client');
+const {createErrorObject} = require('../lib/errors');
 
 module.exports = (req, res, next) => {
     let response;
@@ -22,8 +23,11 @@ module.exports = (req, res, next) => {
                     next();
                 })
                 .catch(error => {
-                    response = {auth: false, message: 'internal server error'};
-                    res.status(500).sendError(error, response);
+                    errorObject = createErrorObject(error, true);
+                    res.status(errorObject.status).sendJson(errorObject.response);
+                    
+                    // response = {auth: false, message: 'internal server error'};
+                    // res.status(500).sendError(error, response);
                 });
         }else{
             // shouldn't reach here

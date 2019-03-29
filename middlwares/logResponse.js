@@ -9,18 +9,24 @@ module.exports = (req, res, next) => {
         if(response && response.token){
             loggedResponse.token = !!response.token;
         }
-        log.response(res.statusCode, loggedResponse);
-        res.status(res.statusCode).json(response);
+        const status = res.statusCode;
+
+        // if status code is 500 error is already logged
+        if(status !== 500){
+            log.response(res.statusCode, loggedResponse);
+        }
+
+        res.status(status).json(response);
     }
 
-    res.sendError = (error, response) => {
-        log.err(res.statusCode, {
-            response,
-            error
-        })
+    // res.sendError = (error, response) => {
+    //     log.err(res.statusCode, {
+    //         response,
+    //         error
+    //     })
 
-        res.status(res.statusCode).json(response);
-    }
+    //     res.status(res.statusCode).json(response);
+    // }
 
     next();
 }

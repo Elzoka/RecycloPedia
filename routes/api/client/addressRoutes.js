@@ -2,6 +2,8 @@ const addressRoutes = require('express').Router();
 const isAuthenticatedClient = require('../../../middlwares/isAuthenticatedClient');
 const {createAddress, updatedAddressField} = require('../../../lib/address');
 const Client = require('../../../models/Client');
+const {createErrorObject} = require('../../../lib/errors');
+
 
 // @route  POST api/client/address 
 // @desc   add new address
@@ -25,14 +27,17 @@ addressRoutes.post('/', isAuthenticatedClient, (req, res) => {
             res.status(200).sendJson(response);
         })
         .catch(error => {
-            if(error.name === 'ValidationError' || error.name === "CastError"){
-                response = {message: "invalid request"};
+            errorObject = createErrorObject(error);
+            res.status(errorObject.status).sendJson(errorObject.response);
+                    
+            // if(error.name === 'ValidationError' || error.name === "CastError"){
+            //     response = {message: "invalid request"};
 
-                return res.status(400).sendJson(response);
-            }
-            response = {message: "internal server error"};
+            //     return res.status(400).sendJson(response);
+            // }
+            // response = {message: "internal server error"};
 
-            res.status(500).sendError(error, response);
+            // res.status(500).sendError(error, response);
         });
 });
 
@@ -61,14 +66,18 @@ addressRoutes.put('/:id', isAuthenticatedClient,(req, res) => {
             res.status(200).sendJson(response);
         })
         .catch(error => {
-            if(error.name === 'ValidationError' || error.name === "CastError"){
-                response = {message: "invalid request"};
+            errorObject = createErrorObject(error);
+            res.status(errorObject.status).sendJson(errorObject.response);
+                    
 
-                return res.status(400).sendJson(response)
-            }
+            // if(error.name === 'ValidationError' || error.name === "CastError"){
+            //     response = {message: "invalid request"};
 
-            response = {message: "internal server error"};
-            res.status(500).sendError(error, response);
+            //     return res.status(400).sendJson(response)
+            // }
+
+            // response = {message: "internal server error"};
+            // res.status(500).sendError(error, response);
         });
 });
 
@@ -86,14 +95,18 @@ addressRoutes.delete("/:id", isAuthenticatedClient, (req, res) => {
             res.status(200).sendJson(response);
         })
         .catch(error => {
-            if(error.name === 'ValidationError' || error.name === "CastError"){
-                response = {message: "invalid request"};
+            // if(error.name === 'ValidationError' || error.name === "CastError"){
+            //     response = {message: "invalid request"};
 
-                return res.status(400).sendJson(response)
-            }
+            //     return res.status(400).sendJson(response)
+            // }
 
-            response = {message: "internal server error"};
-            res.status(500).sendError(error, response);            
+            // response = {message: "internal server error"};
+            // res.status(500).sendError(error, response);
+            
+            errorObject = createErrorObject(error);
+            res.status(errorObject.status).sendJson(errorObject.response);
+                    
         });
 });
 

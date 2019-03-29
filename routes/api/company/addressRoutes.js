@@ -1,6 +1,7 @@
 const addressRoutes = require('express').Router();
 const isAuthenticatedCompany = require('../../../middlwares/isAuthenticatedCompany');
 const {createAddress, updatedAddressField} = require('../../../lib/address');
+const {createErrorObject} = require('../../../lib/errors');
 const Company = require('../../../models/Company');
 
 // @route  POST api/company/address 
@@ -23,14 +24,17 @@ addressRoutes.post('/', isAuthenticatedCompany, (req, res) => {
             res.status(200).sendJson(response);
         })
         .catch(error => {
-            if(error.name === 'ValidationError' || error.name === "CastError"){
-                response = {message: "invalid request"};
+            const errorObject = createErrorObject(error);
+            res.status(errorObject.status).sendJson(errorObject.response);
+            
+            // if(error.name === 'ValidationError' || error.name === "CastError"){
+            //     response = {message: "invalid request"};
 
-                return res.status(400).sendJson(response);
-            }
-            response = {message: "internal server error"};
+            //     return res.status(400).sendJson(response);
+            // }
+            // response = {message: "internal server error"};
 
-            res.status(500).sendError(error, response);
+            // res.status(500).sendError(error, response);
         });
 });
 
@@ -58,14 +62,17 @@ addressRoutes.put('/:id', isAuthenticatedCompany,(req, res) => {
             res.status(200).sendJson(response);
         })
         .catch(error => {
-            if(err.name === 'ValidationError' || err.name === "CastError"){
-                response = {message: "invalid request"};
+            const errorObject = createErrorObject(error);
+            res.status(errorObject.status).sendJson(errorObject.response);
+            
+            // if(err.name === 'ValidationError' || err.name === "CastError"){
+            //     response = {message: "invalid request"};
 
-                return res.status(400).sendJson(response)
-            }
+            //     return res.status(400).sendJson(response)
+            // }
 
-            response = {message: "internal server error"};
-            res.status(500).sendError(error, response);
+            // response = {message: "internal server error"};
+            // res.status(500).sendError(error, response);
         });
 });
 
@@ -83,8 +90,11 @@ addressRoutes.delete("/:id", isAuthenticatedCompany, (req, res) => {
             res.status(200).sendJson(response);
         })
         .catch(error => {
-            response = {message: "internal server error"};
-            res.status(500).sendError(error, response);            
+            const errorObject = createErrorObject(error);
+            res.status(errorObject.status).sendJson(errorObject.response);
+            
+            // response = {message: "internal server error"};
+            // res.status(500).sendError(error, response);      
         });
 });
 

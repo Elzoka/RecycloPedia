@@ -3,6 +3,8 @@ const itemRoutes = require('express').Router();
 const Item = require('../../../models/Item');
 const isAuthenticatedCompany = require('../../../middlwares/isAuthenticatedCompany');
 const {createItemObject, updatedItemFields} = require('../../../lib/item');
+const {createErrorObject} = require('../../../lib/errors');
+
 
 
 // @route  POST api/item 
@@ -64,11 +66,14 @@ itemRoutes.get('/', (req, res) => {
             res.status(200).sendJson(response);
         })
         .catch(error => {
-            response = {
-                message: 'internal server error'
-            };
+            const errorObject = createErrorObject(error);
+            res.status(errorObject.status).sendJson(errorObject.response);
+            
+            // response = {
+            //     message: 'internal server error'
+            // };
 
-            res.status(500).sendError(error, response);            
+            // res.status(500).sendError(error, response);       
         });
 });
 
@@ -96,17 +101,21 @@ itemRoutes.get('/:id', (req, res) => {
             res.status(200).sendJson(response);
         })
         .catch(error => {
-            if(error.name === 'CastError'){
-                response = {message: 'Invalid item Id'};
+            // if(error.name === 'CastError'){
+            //     response = {message: 'Invalid item Id'};
             
-                return res.status(400).sendJson(response);
-            }
+            //     return res.status(400).sendJson(response);
+            // }
             
-            response = {
-                message: 'internal server error'
-            };
+            // response = {
+            //     message: 'internal server error'
+            // };
 
-            res.status(500).sendError(error, response);            
+            // res.status(500).sendError(error, response);           
+
+            const errorObject = createErrorObject(error);
+            res.status(errorObject.status).sendJson(errorObject.response);
+            
         });
 });
 
@@ -152,15 +161,18 @@ itemRoutes.put('/:id', isAuthenticatedCompany, (req, res) => {
         res.status(200).sendJson(response);
     })
     .catch(error => {
-        if(error.name === 'ValidationError' || error.name === "CastError"){
-            response = {message: "invalid request"};
+        const errorObject = createErrorObject(error);
+        res.status(errorObject.status).sendJson(errorObject.response);
+            
+        // if(error.name === 'ValidationError' || error.name === "CastError"){
+        //     response = {message: "invalid request"};
 
-            return res.status(400).sendJson(response)
-        }
+        //     return res.status(400).sendJson(response)
+        // }
 
-        response = {message: "Internal Server Error"};
+        // response = {message: "Internal Server Error"};
 
-        res.status(500).sendError(error, response);
+        // res.status(500).sendError(error, response);
     })
 });
 
@@ -181,14 +193,17 @@ itemRoutes.delete('/:id', isAuthenticatedCompany, (req, res) => {
         res.status(200).sendJson(response)
     })
     .catch(error => {
-        if(error.name === 'CastError'){
-            response = {message: 'Invalid item Id'};
+        const errorObject = createErrorObject(error);
+        res.status(errorObject.status).sendJson(errorObject.response);
+            
+        // if(error.name === 'CastError'){
+        //     response = {message: 'Invalid item Id'};
         
-            return res.status(400).sendJson(response);
-        }
-        response = {message: "Internal Server Error"};
+        //     return res.status(400).sendJson(response);
+        // }
+        // response = {message: "Internal Server Error"};
 
-        res.status(500).sendError(error, response);
+        // res.status(500).sendError(error, response);
     });
 });
 

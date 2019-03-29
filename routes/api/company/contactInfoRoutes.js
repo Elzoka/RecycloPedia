@@ -3,6 +3,8 @@ const contactInfoRoutes = require('express').Router();
 const Company = require('../../../models/Company');
 const {createContactInfo} = require('../../../lib/company');
 const isAuthenticatedCompany = require('../../../middlwares/isAuthenticatedCompany');
+const {createErrorObject} = require('../../../lib/errors');
+
 
 // @route  POST api/company/contact-info 
 // @desc   add new contactInfo
@@ -34,8 +36,11 @@ contactInfoRoutes.post('/', isAuthenticatedCompany, (req, res) => {
             res.status(200).sendJson(response);
         })
         .catch(error => {
-            response = {message: 'internal server error'};
-            res.status(500).sendError(error, response); 
+            const errorObject = createErrorObject(error);
+            res.status(errorObject.status).sendJson(errorObject.response);
+            
+            // response = {message: 'internal server error'};
+            // res.status(500).sendError(error, response); 
         });
 });
 
@@ -81,9 +86,12 @@ contactInfoRoutes.put('/:fieldValue', isAuthenticatedCompany, (req, res) => {
             res.status(200).sendJson(response);
         })
         .catch(error => {
-            response = {message: 'internal server error'};
+            const errorObject = createErrorObject(error);
+            res.status(errorObject.status).sendJson(errorObject.response);
+            
+            // response = {message: 'internal server error'};
     
-            res.status(500).sendError(error, response);
+            // res.status(500).sendError(error, response);
         })
 });
 
@@ -125,9 +133,12 @@ contactInfoRoutes.delete('/', isAuthenticatedCompany, (req, res) => {
             res.status(200).sendJson(response);             
         })
         .catch(error => {
-            response = {message: 'internal server error'};
+            const errorObject = createErrorObject(error);
+            res.status(errorObject.status).sendJson(errorObject.response);
+            
+            // response = {message: 'internal server error'};
 
-            res.status(500).sendError(error, response);
+            // res.status(500).sendError(error, response);
         });
 });
 

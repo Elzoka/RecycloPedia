@@ -2,6 +2,7 @@ const authRoutes = require('express').Router();
 const bcrypt = require('bcryptjs');
 
 const Representative = require('../../../models/Representative');
+const {createErrorObject} = require('../../../lib/errors');
 
 // Auth
 
@@ -49,8 +50,11 @@ authRoutes.post('/login', (req, res) => {
         })
     })
     .catch(error => {
-        response = {auth: false, message: 'Internal Server Error'};
-        res.status(500).sendError(error, response);              
+        // response = {auth: false, message: 'Internal Server Error'};
+        // res.status(500).sendError(error, response);
+        const errorObject = createErrorObject(error, true);
+        res.status(errorObject.status).sendJson(errorObject.response);
+                     
     })
 });
 

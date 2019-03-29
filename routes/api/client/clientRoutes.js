@@ -3,6 +3,7 @@ const clientRoutes = require('express').Router();
 const Client = require('../../../models/Client');
 const isAuthenticatedClient = require('../../../middlwares/isAuthenticatedClient');
 const {createClientObject, updatedClientFields} = require('../../../lib/client');
+const {createErrorObject} = require('../../../lib/errors');
 
 // @route  POST api/client 
 // @desc   create a new client
@@ -23,31 +24,13 @@ clientRoutes.post('/', (req, res) => {
                     res.status(200).sendJson(response);
                 })
                 .catch(error => {
-                    response = {
-                        auth: false,
-                        message: 'internal server error'
-                    };
-
-                    res.status(500).sendError(error, response);
+                    errorObject = createErrorObject(error, true, "try and login");
+                    res.status(errorObject.status).sendJson(errorObject.response);
                 });
         })
         .catch(error => {
-            // code 11000 refers to duplicate key in email index
-            if(error.name === 'MongoError' && error.code === 11000){
-                response = {
-                    auth: false,
-                    message: 'email already exists'
-                };
-
-                return res.status(400).sendJson(response);
-            }
-
-            response = {
-                auth: false,
-                message: 'invalid data'
-            };
-
-            res.status(400).sendJson(response);
+            errorObject = createErrorObject(error, true);
+            res.status(errorObject.status).sendJson(errorObject.response);
         })
 });
 
@@ -76,9 +59,13 @@ clientRoutes.get('/', (req, res) => {
         res.status(200).sendJson(response);
     })
     .catch(error => {
-        response = {message: 'Internal Server error'};
+        errorObject = createErrorObject(error);
+        res.status(errorObject.status).sendJson(errorObject.response);
+                    
+        
+        // response = {message: 'Internal Server error'};
 
-        res.status(500).sendError(error, response);
+        // res.status(500).sendError(error, response);
     })
 });
 
@@ -111,14 +98,17 @@ clientRoutes.get('/:id', (req, res) => {
         res.status(200).sendJson(response);
     })
     .catch(error => {
-        if(error.name === 'CastError'){
-            response = {message: 'Invalid Client Id'};
+        errorObject = createErrorObject(error);
+        res.status(errorObject.status).sendJson(errorObject.response);
+                    
+        // if(error.name === 'CastError'){
+        //     response = {message: 'Invalid Client Id'};
         
-            return res.status(400).sendJson(response);
-        }
+        //     return res.status(400).sendJson(response);
+        // }
 
-        response = {message: 'internal server error'};
-        res.status(500).sendError(error ,response);
+        // response = {message: 'internal server error'};
+        // res.status(500).sendError(error ,response);
     })
 });
 
@@ -141,18 +131,21 @@ clientRoutes.put('/', isAuthenticatedClient, (req, res) => {
         res.status(200).sendJson(response);
     })
     .catch(error => {
-        // code 11000 refers to duplicate key in email index
-        if(error.name === 'MongoError' && error.code === 11000){
-            response = {
-                message: 'email already exists'
-            };
+        errorObject = createErrorObject(error);
+        res.status(errorObject.status).sendJson(errorObject.response);
+                    
+        // // code 11000 refers to duplicate key in email index
+        // if(error.name === 'MongoError' && error.code === 11000){
+        //     response = {
+        //         message: 'email already exists'
+        //     };
 
-            return res.status(400).sendJson(response);
-        }
+        //     return res.status(400).sendJson(response);
+        // }
 
-        response = {message: "Internal Server Error"};
+        // response = {message: "Internal Server Error"};
 
-        res.status(500).sendError(error, response);
+        // res.status(500).sendError(error, response);
     })
 });
 
@@ -171,9 +164,12 @@ clientRoutes.delete('/', isAuthenticatedClient, (req, res) => {
         res.status(200).sendJson(response)
     })
     .catch(error => {
-        response = {message: "Internal Server Error"};
+        errorObject = createErrorObject(error);
+        res.status(errorObject.status).sendJson(errorObject.response);
+                    
+        // response = {message: "Internal Server Error"};
 
-        res.status(500).sendError(error, response);
+        // res.status(500).sendError(error, response);
     });
 });
 
