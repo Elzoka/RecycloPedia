@@ -24,12 +24,12 @@ clientRoutes.post('/', (req, res) => {
                     res.status(200).sendJson(response);
                 })
                 .catch(error => {
-                    errorObject = createErrorObject(error, true, "try and login");
+                    const errorObject = createErrorObject(error, true, "try and login");
                     res.status(errorObject.status).sendJson(errorObject.response);
                 });
         })
         .catch(error => {
-            errorObject = createErrorObject(error, true);
+            const errorObject = createErrorObject(error, true);
             res.status(errorObject.status).sendJson(errorObject.response);
         })
 });
@@ -59,7 +59,7 @@ clientRoutes.get('/', (req, res) => {
         res.status(200).sendJson(response);
     })
     .catch(error => {
-        errorObject = createErrorObject(error);
+        const errorObject = createErrorObject(error);
         res.status(errorObject.status).sendJson(errorObject.response);
                     
         
@@ -98,7 +98,7 @@ clientRoutes.get('/:id', (req, res) => {
         res.status(200).sendJson(response);
     })
     .catch(error => {
-        errorObject = createErrorObject(error);
+        const errorObject = createErrorObject(error);
         res.status(errorObject.status).sendJson(errorObject.response);
                     
         // if(error.name === 'CastError'){
@@ -131,7 +131,7 @@ clientRoutes.put('/', isAuthenticatedClient, (req, res) => {
         res.status(200).sendJson(response);
     })
     .catch(error => {
-        errorObject = createErrorObject(error);
+        const errorObject = createErrorObject(error);
         res.status(errorObject.status).sendJson(errorObject.response);
                     
         // // code 11000 refers to duplicate key in email index
@@ -164,12 +164,8 @@ clientRoutes.delete('/', isAuthenticatedClient, (req, res) => {
         res.status(200).sendJson(response)
     })
     .catch(error => {
-        errorObject = createErrorObject(error);
+        const errorObject = createErrorObject(error);
         res.status(errorObject.status).sendJson(errorObject.response);
-                    
-        // response = {message: "Internal Server Error"};
-
-        // res.status(500).sendError(error, response);
     });
 });
 

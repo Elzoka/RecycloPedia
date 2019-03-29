@@ -10,19 +10,29 @@ const ClientSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
+        maxlength: 25
     },
     address: [AddressSchema],
     points: { // @TODO add transaction incoming & outgoing
         type: Number,
-        default: 0
+        default: 0,
+        min: [0, 'invalid operation']
     },
     requests: [{
         type: mongoose.Schema.ObjectId,
-        ref: 'request'
+        ref: 'request',
+        validate: {
+            validator: val => validator.isMongoId(val.toString()), // shouldn't use this validator but just in case
+            message: 'invalid id'
+        }
     }],
     phone: {
         type: String,
-        required: true
+        required: true,
+        validate: {
+            validator: value => validator.isMobilePhone(value, 'ar-EG'),
+            message: 'invalid phone number'
+        }
     },
     email: {
         type: String,
@@ -31,8 +41,8 @@ const ClientSchema = new mongoose.Schema({
         unique: true,
         required: true,
         validate: {
-            validator:validator.isEmail,
-            message: props => `${props.value} is not a valid email`
+            validator: validator.isEmail,
+            message: 'email field is invalid'
         }
     },
     password: {

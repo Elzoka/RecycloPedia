@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const validator = require('validator');
 
 const config = require('../config');
 
@@ -8,26 +9,36 @@ const RepresentativeSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
+        maxlength: 30,
     },
     requests: [{
         type: mongoose.Schema.ObjectId,
-        ref: 'request'
+        ref: 'request',
+        validate: {
+            validator: val => validator.isMongoId(val.toString()),
+            message: 'invalid request id'
+        }
     }],
     company: {
         type: mongoose.Schema.ObjectId,
         ref: 'company',
-        required: true
+        required: true,
+        validate: {
+            validator: val => validator.isMongoId(val.toString()),
+            message: 'invalid company id'
+        }
     },
     username: {
         type: String,
         trim: true,
         lowercase: true,
         unique: true,
-        required: true
+        required: true,
+        maxlength: 30,
     },
     password: {
         type: String,
-        required: true
+        required: true,
     },
     createdAt: {
         type: Date,

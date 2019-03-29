@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const validator = require('validator');
 
 const config = require('../config');
 const AddressSchema = require('./shema/AddressSchema');
@@ -17,7 +18,8 @@ const CompanySchema = new mongoose.Schema({ // @TODO add transaction => incoming
     address: [AddressSchema],
     points: { // @TODO check if the availabe point are enough for each assigned request
         type: Number,
-        default: 0
+        default: 0,
+        min: [0, 'invalid operation']
     },
     serviceAvailableIn: [{ // @TODO add REST routes when more info available
         type: String
@@ -27,14 +29,22 @@ const CompanySchema = new mongoose.Schema({ // @TODO add transaction => incoming
             type: String,
             trim: true,
             lowercase: true,
+            validate: {
+                validator: validator.isEmail,
+                message: 'email field is invalid'
+            }
         }],
         phone: [{
             type: String,
             trim: true,
+            validate: {
+                validator: val => validator.isMobilePhone(val, 'ar-EG'),
+                message: 'phone field is invalid'
+            }
         }],
         fax: [{
             type: String,
-            trim: true,
+            trim: true // @TODO add validation or maybe delete this field
         }]
     },
     email: {
@@ -42,7 +52,11 @@ const CompanySchema = new mongoose.Schema({ // @TODO add transaction => incoming
         trim: true,
         lowercase: true,
         unique: true,
-        required: true
+        required: true,
+        validate: {
+            validator: validator.isEmail,
+            message: 'email field is invalid'
+        }
     },
     password: {
         type: String,

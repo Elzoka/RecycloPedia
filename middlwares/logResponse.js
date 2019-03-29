@@ -18,15 +18,6 @@ module.exports = (req, res, next) => {
 
         res.status(status).json(response);
     }
-
-    // res.sendError = (error, response) => {
-    //     log.err(res.statusCode, {
-    //         response,
-    //         error
-    //     })
-
-    //     res.status(res.statusCode).json(response);
-    // }
-
+    
     next();
 }

@@ -27,17 +27,8 @@ addressRoutes.post('/', isAuthenticatedClient, (req, res) => {
             res.status(200).sendJson(response);
         })
         .catch(error => {
-            errorObject = createErrorObject(error);
+            const errorObject = createErrorObject(error);
             res.status(errorObject.status).sendJson(errorObject.response);
-                    
-            // if(error.name === 'ValidationError' || error.name === "CastError"){
-            //     response = {message: "invalid request"};
-
-            //     return res.status(400).sendJson(response);
-            // }
-            // response = {message: "internal server error"};
-
-            // res.status(500).sendError(error, response);
         });
 });
 
@@ -66,18 +57,8 @@ addressRoutes.put('/:id', isAuthenticatedClient,(req, res) => {
             res.status(200).sendJson(response);
         })
         .catch(error => {
-            errorObject = createErrorObject(error);
+            const errorObject = createErrorObject(error);
             res.status(errorObject.status).sendJson(errorObject.response);
-                    
-
-            // if(error.name === 'ValidationError' || error.name === "CastError"){
-            //     response = {message: "invalid request"};
-
-            //     return res.status(400).sendJson(response)
-            // }
-
-            // response = {message: "internal server error"};
-            // res.status(500).sendError(error, response);
         });
 });
 
@@ -95,16 +76,7 @@ addressRoutes.delete("/:id", isAuthenticatedClient, (req, res) => {
             res.status(200).sendJson(response);
         })
         .catch(error => {
-            // if(error.name === 'ValidationError' || error.name === "CastError"){
-            //     response = {message: "invalid request"};
-
-            //     return res.status(400).sendJson(response)
-            // }
-
-            // response = {message: "internal server error"};
-            // res.status(500).sendError(error, response);
-            
-            errorObject = createErrorObject(error);
+            const errorObject = createErrorObject(error);
             res.status(errorObject.status).sendJson(errorObject.response);
                     
         });

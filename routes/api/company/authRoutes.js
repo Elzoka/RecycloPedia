@@ -52,9 +52,6 @@ authRoutes.post('/login', (req, res) => {
     .catch(error => {
         const errorObject = createErrorObject(error);
         res.status(errorObject.status).sendJson(errorObject.response);
-            
-        // response = {auth: false, message: 'Internal Server Error'};
-        // res.status(500).sendError(error, response);         
     })
 });
 

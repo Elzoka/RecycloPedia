@@ -38,9 +38,6 @@ contactInfoRoutes.post('/', isAuthenticatedCompany, (req, res) => {
         .catch(error => {
             const errorObject = createErrorObject(error);
             res.status(errorObject.status).sendJson(errorObject.response);
-            
-            // response = {message: 'internal server error'};
-            // res.status(500).sendError(error, response); 
         });
 });
 
@@ -88,10 +85,6 @@ contactInfoRoutes.put('/:fieldValue', isAuthenticatedCompany, (req, res) => {
         .catch(error => {
             const errorObject = createErrorObject(error);
             res.status(errorObject.status).sendJson(errorObject.response);
-            
-            // response = {message: 'internal server error'};
-    
-            // res.status(500).sendError(error, response);
         })
 });
 
@@ -135,10 +128,6 @@ contactInfoRoutes.delete('/', isAuthenticatedCompany, (req, res) => {
         .catch(error => {
             const errorObject = createErrorObject(error);
             res.status(errorObject.status).sendJson(errorObject.response);
-            
-            // response = {message: 'internal server error'};
-
-            // res.status(500).sendError(error, response);
         });
 });
 

@@ -42,13 +42,7 @@ requestRoutes.get('/', isAuthenticatedCompany, (req, res) => {
 
             res.status(200).sendJson(response);
         })
-        .catch(error => {
-            // response = {
-            //     message: 'internal server error'
-            // };
-
-            // res.status(500).sendError(error, response);            
-
+        .catch(error => {      
             const errorObject = createErrorObject(error);
             res.status(errorObject.status).sendJson(errorObject.response);
             
@@ -86,19 +80,7 @@ requestRoutes.get('/:id', isAuthenticatedCompany,(req, res) => {
         })
         .catch(error => {
             const errorObject = createErrorObject(error);
-            res.status(errorObject.status).sendJson(errorObject.response);
-            
-            // if(error.name === 'CastError'){
-            //     response = {message: 'Invalid Request Id'};
-            
-            //     return res.status(400).sendJson(response);
-            // }
-            
-            // response = {
-            //     message: 'internal server error'
-            // };
-
-            // res.status(500).sendError(error, response);            
+            res.status(errorObject.status).sendJson(errorObject.response);      
         });
 });
 
@@ -150,16 +132,6 @@ requestRoutes.put('/:id', isAuthenticatedCompany, async (req, res) => {
     } catch(error){
         const errorObject = createErrorObject(error);
         res.status(errorObject.status).sendJson(errorObject.response);
-            
-        // if(error.name === 'ValidationError' || error.name === "CastError"){
-        //     response = {message: "invalid request"};
-
-        //     return res.status(400).sendJson(response)
-        // }
-
-        // response = {message: "Internal Server Error"};
-
-        // res.status(500).sendError(error, response);
     }
 });
 

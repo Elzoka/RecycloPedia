@@ -27,11 +27,8 @@ itemRoutes.post('/', isAuthenticatedCompany,(req, res) => {
             res.status(200).sendJson(response);
         })
         .catch(error => {
-            response = {
-                message: 'invalid data'
-            };
-
-            res.status(400).sendJson(response);            
+            const errorObject = createErrorObject(error);
+            res.status(errorObject.status).sendJson(errorObject.response);        
         });
 });
 
@@ -68,12 +65,6 @@ itemRoutes.get('/', (req, res) => {
         .catch(error => {
             const errorObject = createErrorObject(error);
             res.status(errorObject.status).sendJson(errorObject.response);
-            
-            // response = {
-            //     message: 'internal server error'
-            // };
-
-            // res.status(500).sendError(error, response);       
         });
 });
 
@@ -100,19 +91,7 @@ itemRoutes.get('/:id', (req, res) => {
 
             res.status(200).sendJson(response);
         })
-        .catch(error => {
-            // if(error.name === 'CastError'){
-            //     response = {message: 'Invalid item Id'};
-            
-            //     return res.status(400).sendJson(response);
-            // }
-            
-            // response = {
-            //     message: 'internal server error'
-            // };
-
-            // res.status(500).sendError(error, response);           
-
+        .catch(error => {    
             const errorObject = createErrorObject(error);
             res.status(errorObject.status).sendJson(errorObject.response);
             
@@ -163,16 +142,6 @@ itemRoutes.put('/:id', isAuthenticatedCompany, (req, res) => {
     .catch(error => {
         const errorObject = createErrorObject(error);
         res.status(errorObject.status).sendJson(errorObject.response);
-            
-        // if(error.name === 'ValidationError' || error.name === "CastError"){
-        //     response = {message: "invalid request"};
-
-        //     return res.status(400).sendJson(response)
-        // }
-
-        // response = {message: "Internal Server Error"};
-
-        // res.status(500).sendError(error, response);
     })
 });
 
@@ -195,15 +164,6 @@ itemRoutes.delete('/:id', isAuthenticatedCompany, (req, res) => {
     .catch(error => {
         const errorObject = createErrorObject(error);
         res.status(errorObject.status).sendJson(errorObject.response);
-            
-        // if(error.name === 'CastError'){
-        //     response = {message: 'Invalid item Id'};
-        
-        //     return res.status(400).sendJson(response);
-        // }
-        // response = {message: "Internal Server Error"};
-
-        // res.status(500).sendError(error, response);
     });
 });
 

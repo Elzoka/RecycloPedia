@@ -22,39 +22,10 @@ repRoutes.post('/', isAuthenticatedCompany, (req, res) => {
                     response = {auth: true, token};
                     res.status(200).sendJson(response);
                 })
-                // .catch(error => {
-                //     const errorObject = createErrorObject(error);
-                //     res.status(errorObject.status).sendJson(errorObject.response);
-            
-                //     // response = {
-                //     //     auth: false,
-                //     //     message: 'internal server error' // @TODO if this error happens ask the user to try and login
-                //     // };
-
-                //     // res.status(500).sendError(error, response);
-                // });
         })
         .catch(error => {
-            errorObject = createErrorObject(error, true);
+            const errorObject = createErrorObject(error, true);
             res.status(errorObject.status).sendJson(errorObject.response);
-
-
-            // // code 11000 refers to duplicate key in email index
-            // if(error.name === 'MongoError' && error.code === 11000){
-            //     response = {
-            //         auth: false,
-            //         message: 'username already exists'
-            //     };
-
-            //     return res.status(400).sendJson(response);
-            // }
-
-            // response = {
-            //     auth: false,
-            //     message: 'invalid data'
-            // };
-
-            // res.status(400).sendJson(response);
         });
 });
 
@@ -81,10 +52,6 @@ repRoutes.get('/', isAuthenticatedCompany, (req, res) => {
         res.status(200).sendJson(response);
     })
     .catch(error => {
-        // response = {message: 'Internal Server error'};
-
-        // res.status(500).sendError(error, response);
-
         const errorObject = createErrorObject(error);
         res.status(errorObject.status).sendJson(errorObject.response);
             
@@ -125,15 +92,6 @@ repRoutes.get('/:id', (req, res) => {
     .catch(error => {
         const errorObject = createErrorObject(error);
         res.status(errorObject.status).sendJson(errorObject.response);
-            
-        // if(error.name === 'CastError'){
-        //     response = {message: 'Invalid Representative Id'};
-        
-        //     return res.status(400).sendJson(response);
-        // }
-        
-        // response = {message: 'internal server error'};
-        // res.status(500).sendError(error ,response);
     })
 });
 
@@ -162,25 +120,6 @@ repRoutes.put('/:id', isAuthenticatedCompany, (req, res) => {
         res.status(200).sendJson(response);
     })
     .catch(error => {
-        // @TODO refactor the error section to handle mongodb errors in seprate function
-        // code 11000 refers to duplicate key in email index
-        // if(error.name === 'MongoError' && error.code === 11000){
-        //     response = {
-        //         message: 'username already exists'
-        //     };
-
-        //     return res.status(400).sendJson(response);
-        // }
-
-        // if(error.name === 'CastError'){
-        //     response = {message: 'Invalid Representative Id'};
-        //     return res.status(400).sendJson(response);
-        // }
-        
-        // response = {message: "Internal Server Error"};
-
-        // res.status(500).sendError(error, response);
-
         const errorObject = createErrorObject(error);
         res.status(errorObject.status).sendJson(errorObject.response);
             
@@ -203,15 +142,6 @@ repRoutes.delete('/:id', isAuthenticatedCompany, (req, res) => {
         res.status(200).sendJson(response)
     })
     .catch(error => {
-        // if(error.name === 'CastError'){
-        //     response = {message: 'Invalid Representative Id'};
-        //     return res.status(400).sendJson(response);
-        // }
-        
-        // response = {message: "Internal Server Error"};
-
-        // res.status(500).sendError(error, response);
-
         const errorObject = createErrorObject(error);
         res.status(errorObject.status).sendJson(errorObject.response);
             

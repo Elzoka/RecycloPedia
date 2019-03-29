@@ -23,11 +23,8 @@ module.exports = (req, res, next) => {
                     next();
                 })
                 .catch(error => {
-                    errorObject = createErrorObject(error, true, "try and login");
+                    const errorObject = createErrorObject(error, true, "try and login");
                     res.status(errorObject.status).sendJson(errorObject.response);
-                    
-                    // response = {auth: false, message: 'internal server error'};
-                    // res.status(500).sendError(error, response);
                 });
         }else{
             // shouldn't reach here

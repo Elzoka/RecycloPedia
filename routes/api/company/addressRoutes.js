@@ -26,15 +26,6 @@ addressRoutes.post('/', isAuthenticatedCompany, (req, res) => {
         .catch(error => {
             const errorObject = createErrorObject(error);
             res.status(errorObject.status).sendJson(errorObject.response);
-            
-            // if(error.name === 'ValidationError' || error.name === "CastError"){
-            //     response = {message: "invalid request"};
-
-            //     return res.status(400).sendJson(response);
-            // }
-            // response = {message: "internal server error"};
-
-            // res.status(500).sendError(error, response);
         });
 });
 
@@ -64,15 +55,6 @@ addressRoutes.put('/:id', isAuthenticatedCompany,(req, res) => {
         .catch(error => {
             const errorObject = createErrorObject(error);
             res.status(errorObject.status).sendJson(errorObject.response);
-            
-            // if(err.name === 'ValidationError' || err.name === "CastError"){
-            //     response = {message: "invalid request"};
-
-            //     return res.status(400).sendJson(response)
-            // }
-
-            // response = {message: "internal server error"};
-            // res.status(500).sendError(error, response);
         });
 });
 
@@ -92,9 +74,6 @@ addressRoutes.delete("/:id", isAuthenticatedCompany, (req, res) => {
         .catch(error => {
             const errorObject = createErrorObject(error);
             res.status(errorObject.status).sendJson(errorObject.response);
-            
-            // response = {message: "internal server error"};
-            // res.status(500).sendError(error, response);      
         });
 });
 

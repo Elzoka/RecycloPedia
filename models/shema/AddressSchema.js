@@ -1,26 +1,33 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
 
 const AddressSchema = new mongoose.Schema({
     country: { // @TODO add validation for available countries and cities
         type: String,
-        required: true
+        required: true,
     },
     city: {
         type: String,
-        required: true
+        required: true,
     },
-    extra: { // @TODO rename it description
+    extra: { // @TODO rename it to a more descriptive name
         type: String,
-        required: true
+        required: true,
     },
     coordinates: {
-        latitude: {
-            type: mongoose.Decimal128,
-            required: true
+        type: {
+            latitude: {
+                type: mongoose.Decimal128,
+                required: true,
+            },
+            longitude: {
+                type: mongoose.Decimal128,
+                required: true,
+            }
         },
-        longitude: {
-            type: mongoose.Decimal128,
-            required: true
+        validate: {
+            validator: ({latitude, longitude}) => validator.isLatLong(`${latitude}, ${longitude}`),
+            message: 'invalid coordinates'
         }
     }
 });
