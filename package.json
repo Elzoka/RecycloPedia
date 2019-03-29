@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev:server": "NODE_DEBUG=server nodemon index.js"
+    "dev:server": "NODE_DEBUG=server nodemon index.js",
+    "test:server": "NODE_ENV=test && jest /tests -i --watchAll"
   },
   "author": "Mahmoud Elzoka",
   "license": "ISC",
@@ -17,6 +18,8 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
-    "nodemon": "^1.18.9"
+    "jest": "^24.5.0",
+    "nodemon": "^1.18.9",
+    "supertest": "^4.0.2"
   }
 }
