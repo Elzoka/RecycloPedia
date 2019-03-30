@@ -61,11 +61,6 @@ clientRoutes.get('/', (req, res) => {
     .catch(error => {
         const errorObject = createErrorObject(error);
         res.status(errorObject.status).sendJson(errorObject.response);
-                    
-        
-        // response = {message: 'Internal Server error'};
-
-        // res.status(500).sendError(error, response);
     })
 });
 
@@ -100,15 +95,6 @@ clientRoutes.get('/:id', (req, res) => {
     .catch(error => {
         const errorObject = createErrorObject(error);
         res.status(errorObject.status).sendJson(errorObject.response);
-                    
-        // if(error.name === 'CastError'){
-        //     response = {message: 'Invalid Client Id'};
-        
-        //     return res.status(400).sendJson(response);
-        // }
-
-        // response = {message: 'internal server error'};
-        // res.status(500).sendError(error ,response);
     })
 });
 
@@ -133,19 +119,6 @@ clientRoutes.put('/', isAuthenticatedClient, (req, res) => {
     .catch(error => {
         const errorObject = createErrorObject(error);
         res.status(errorObject.status).sendJson(errorObject.response);
-                    
-        // // code 11000 refers to duplicate key in email index
-        // if(error.name === 'MongoError' && error.code === 11000){
-        //     response = {
-        //         message: 'email already exists'
-        //     };
-
-        //     return res.status(400).sendJson(response);
-        // }
-
-        // response = {message: "Internal Server Error"};
-
-        // res.status(500).sendError(error, response);
     })
 });
 

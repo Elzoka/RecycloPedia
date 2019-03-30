@@ -31,7 +31,7 @@ const ClientSchema = new mongoose.Schema({
         required: true,
         validate: {
             validator: value => validator.isMobilePhone(value, 'ar-EG'),
-            message: 'invalid phone number'
+            message: 'phone field is invalid'
         }
     },
     email: {

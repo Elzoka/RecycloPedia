@@ -18,6 +18,7 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
+    "faker": "^4.1.0",
     "jest": "^24.5.0",
     "nodemon": "^1.18.9",
     "supertest": "^4.0.2"
