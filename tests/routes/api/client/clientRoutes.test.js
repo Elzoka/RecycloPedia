@@ -236,4 +236,124 @@ describe(`${rootRoute}`, () => {
 
     });
 
+    describe('PUT /', () => {
+        let clientObject = null;
+        let token = null;
+        let updates = {
+            name: 'Mahmoud',
+            phone: '01234567891',
+            password: '123456', // extra update should be ignored
+            email: 'mahmoud@yahoo.com'
+        }
+
+        beforeEach(async () => {
+            let client = randomClient();
+            clientObject = await Client.create(client);
+            token = await clientObject.generateAuthToken();
+        });
+
+        describe('200: ', () => {
+
+            test('should return0 client is updated', async() => {
+                await request(app)
+                    .put(`${rootRoute}/`)
+                    .set('auth', token)
+                    .send(updates)
+                    .expect(({status, body}) => {
+                        expect(status).toBe(200);
+                        // check number found (must be one not more)
+                        expect(body.result.n).toBe(1);
+                        // check number modified
+                        expect(body.result.nModified).toBe(1);
+                        // check if operation is ok
+                        expect(body.result.ok).toBe(1);
+    
+                        Client.findOne({_id: clientObject._id})
+                            .then(dbClient => {
+                                expect(dbClient.name).toEqual(updates.name);
+                                expect(dbClient.phone).toEqual(updates.phone);
+                                expect(dbClient.email).toEqual(updates.email);
+                            })
+                    })
+            });
+
+            test('should return client is not updated', async() => {
+                await request(app)
+                    .put(`${rootRoute}/`)
+                    .set('auth', token)
+                    .send({})
+                    .expect(({status, body}) => {
+                        expect(status).toBe(200);
+                        // check number found (must be one not more)
+                        expect(body.result.n).toBe(0);
+                        // check number modified
+                        expect(body.result.nModified).toBe(0);
+                        // check if operation is ok
+                        expect(body.result.ok).toBe(0);
+    
+                        Client.findOne({_id: clientObject._id})
+                            .then(dbClient => {
+                                // not updated
+                                expect(dbClient.name).toEqual(clientObject.name);
+                                expect(dbClient.phone).toEqual(clientObject.phone);
+                                expect(dbClient.email).toEqual(clientObject.email);
+                            })
+                    })
+            });
+        });
+        describe('401: ', () => {
+
+
+            test('if invalid client token is provided', async() => {
+
+                request(app)
+                    .put(`${rootRoute}/`)
+                    .send(updates) // don't change
+                    .expect(({status, body}) => {
+                    .set('auth', token + '1')
+                        expect(status).toBe(401);
+                        expect(body.message).toEqual("UnAuthorized")
+                        return Client.findOne({_id: clientObject._id})
+                            .then(dbClient => {
+                                expect(dbClient.name).toEqual(clientObject.name);
+                                expect(dbClient.phone).toEqual(clientObject.phone);
+                                expect(dbClient.email).toEqual(clientObject.email);
+                            })
+                    })
+                });
+
+            test('if no client token is provided', async() => {
+                await request(app)
+                    .put(`${rootRoute}/`)
+                    .set('auth', '')
+                    .send(updates) // don't change
+                    .expect(({status, body}) => {
+                        expect(status).toBe(401);
+                        expect(body.message).toEqual("UnAuthorized")
+                        return Client.findOne({_id: clientObject._id})
+                            .then(dbClient => {
+                                expect(dbClient.name).toEqual(clientObject.name);
+                                expect(dbClient.phone).toEqual(clientObject.phone);
+                                expect(dbClient.email).toEqual(clientObject.email);
+                            })
+                    })
+            });
+
+
+            test('if token that leads to non existing client', async() => {
+                await Client.deleteMany({});
+                await request(app)
+                .put(`${rootRoute}/`)
+                .set('auth', token)
+                .send(updates) // don't change
+                .expect(({status, body}) => {
+                    expect(status).toBe(401);
+                    expect(body.message).toEqual("UnAuthorized");
+                })
+
+            });
+        });
+
+
+    });
 });
