@@ -13,7 +13,6 @@ clientRoutes.post('/', (req, res) => {
     let response;
     // validate request data
     const clientObj = createClientObject(req.body);
-
     Client
         .create(clientObj)
         .then(newClient => {
@@ -39,30 +38,31 @@ clientRoutes.post('/', (req, res) => {
 // @desc   get clients
 // @access Public @TODO (maybe only admins)
 
-clientRoutes.get('/', (req, res) => {
-    let response;
-    // pagination
-    const page = req.query.page || 1;
-    const limit =  req.query.limit && req.query.limit <= 20 ? req.query.limit : 10;
+// @TODO uncomment it if you have a use for it
+// clientRoutes.get('/', (req, res) => {
+//     let response;
+//     // pagination
+//     const page = req.query.page || 1;
+//     const limit =  req.query.limit && req.query.limit <= 20 ? req.query.limit : 10;
 
-    // @TODO sort by location - name - createdAt - etc
-    Client
-    .find({}, {name: 1, phone: 1, rating: 1})
-    .sort({name: -1})
-    .skip((page - 1) * limit)
-    .limit(limit)
-    .then(clients => {
-        response = {
-            clients
-        };
+//     // @TODO sort by location - name - createdAt - etc
+//     Client
+//     .find({}, {name: 1, phone: 1, rating: 1})
+//     .sort({name: -1})
+//     .skip((page - 1) * limit)
+//     .limit(limit)
+//     .then(clients => {
+//         response = {
+//             clients
+//         };
 
-        res.status(200).sendJson(response);
-    })
-    .catch(error => {
-        const errorObject = createErrorObject(error);
-        res.status(errorObject.status).sendJson(errorObject.response);
-    })
-});
+//         res.status(200).sendJson(response);
+//     })
+//     .catch(error => {
+//         const errorObject = createErrorObject(error);
+//         res.status(errorObject.status).sendJson(errorObject.response);
+//     })
+// });
 
 // @route  GET api/client:id 
 // @desc   get client by id
@@ -84,7 +84,10 @@ clientRoutes.get('/:id', (req, res) => {
     )
     .then(client => {
         if(!client){
-            response = {message: 'Client not found'};
+            response = {
+                client: null,
+                message: 'Client not found'
+            };
 
             return res.status(404).sendJson(response);
         }

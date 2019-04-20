@@ -47,7 +47,7 @@ const ClientSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true
+        required: true // @TODO add seprate routes to passwards
     },
     rating: {
         type: Number, // @TODO calculate rating from requests 

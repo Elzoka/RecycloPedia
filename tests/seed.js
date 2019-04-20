@@ -20,6 +20,16 @@ _lib.randomClientArray = (clientsNumber) => {
     return clientsArray;
 }
 
+_lib.randomAddress = () => {
+    return {
+        country: faker.address.country(),
+        city: faker.address.city(),
+        extra: faker.lorem.sentence(),
+        latitude: faker.address.latitude(),
+        longitude: faker.address.longitude()
+    };
+}
+
 
 
 

@@ -8,7 +8,7 @@ module.exports = (req, res, next) => {
     const token = req.headers['auth'];
     jwt.verify(token, config.JWT_CLIENT_SECRET,(error, decoded) => {
         if(error){
-            response = {auth: false, message: 'Unauthorized'};
+            response = {auth: false, message: 'UnAuthorized'};
             return res.status(401).sendJson(response);
         }
 

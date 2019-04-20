@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 const request = require('supertest');
+const bcrypt = require('bcryptjs');
 
 const app = require('../../../../app');
 const {MONGODB_URI} = require('../../../../config');
 const Client = require('../../../../models/Client');
-const {randomClient} = require('../../../seed');
+const {randomClient, randomAddress} = require('../../../seed');
 
 
 beforeAll(async () => {
@@ -32,7 +33,7 @@ describe(`${rootRoute}`, () => {
         beforeEach(() => {
             clientObject = randomClient();
         });
-        describe('should return 200: ', () => {
+        describe('200: ', () => {
 
             test('if valid data is provided', async () => {
                 await request(app)
@@ -57,7 +58,7 @@ describe(`${rootRoute}`, () => {
 
         });
 
-        describe('should return 400: ', () => {
+        describe('400: ', () => {
 
             test('if email is not provided', () => {
                 const {email, ...newClientObject} = clientObject;
@@ -127,29 +128,30 @@ describe(`${rootRoute}`, () => {
             });
         });
 
-    });
-});
+        async function _testInvalidField(clientObject, fieldNames = [], errorMessage = null){
+            fieldNames = fieldNames && (typeof fieldNames === 'string') ? [fieldNames] : fieldNames;
+            await request(app)
+            .post(rootRoute)
+            .send(clientObject)
+            .expect(({body, status}) =>{
+                expect(status).toBe(400);
+                expect(body.auth).toBe(false);
+                const expectedObject = {};
 
-async function _testInvalidField(clientObject, fieldNames = [], errorMessage = null){
-    fieldNames = fieldNames && (typeof fieldNames === 'string') ? [fieldNames] : fieldNames;
-    await request(app)
-    .post(rootRoute)
-    .send(clientObject)
-    .expect(({body, status}) =>{
-        expect(status).toBe(400);
-        expect(body.auth).toBe(false);
-        const expectedObject = {};
+                fieldNames.forEach(field => {
+                    expectedObject[field] = errorMessage || `${field} field is required.`
+                })
 
-        fieldNames.forEach(field => {
-            expectedObject[field] = errorMessage || `${field} field is required.`
-        })
-        // console.log(body);
-        expect(body.errors).toMatchObject(expectedObject);
+                expect(body.errors).toMatchObject(expectedObject);
 
-        Client
-            .findOne({email: clientObject.email})
-            .then(client => {
-                expect(client).toBeNull();
+                Client
+                    .findOne({email: clientObject.email})
+                    .then(client => {
+                        expect(client).toBeNull();
+                    })
             })
-    })
-}
+        }
+
+    });
+
+    });
