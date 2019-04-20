@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const request = require('supertest');
-const bcrypt = require('bcryptjs');
 
 const app = require('../../../../app');
 const {MONGODB_URI} = require('../../../../config');
@@ -309,8 +308,8 @@ describe(`${rootRoute}`, () => {
                 request(app)
                     .put(`${rootRoute}/`)
                     .send(updates) // don't change
-                    .expect(({status, body}) => {
                     .set('auth', token + '1')
+                    .expect(({status, body}) => {
                         expect(status).toBe(401);
                         expect(body.message).toEqual("UnAuthorized")
                         return Client.findOne({_id: clientObject._id})
@@ -350,10 +349,59 @@ describe(`${rootRoute}`, () => {
                     expect(status).toBe(401);
                     expect(body.message).toEqual("UnAuthorized");
                 })
-
             });
+
         });
 
 
     });
+
+    describe('DELETE /', () => {
+        beforeEach(async () => {
+            let client = randomClient();
+            clientObject = await Client.create(client);
+            token = await clientObject.generateAuthToken();
+        });
+
+        describe('200: ', () => {
+            test('should delete client from db', async () => {
+                await request(app)
+                    .delete(rootRoute)
+                    .set('auth', token)
+                    .expect(async ({status, body}) => {
+                        expect(status).toBe(200);
+                        expect(body.result.n).toBe(1);
+                        expect(body.result.ok).toBe(1);
+                        await expect(Client.countDocuments()).resolves.toBe(0);
+                    })
+            });
+        });
+
+        describe('401: ', () => {
+            test('if invalid client token is provided', async() => {
+
+                request(app)
+                    .delete(`${rootRoute}/`)
+                    .set('auth', token + '1')
+                    .expect(async ({status, body}) => {
+                        expect(status).toBe(401);
+                        expect(body.message).toEqual("UnAuthorized")
+                        await expect(Client.countDocuments()).resolves.toBe(1);                        
+                    })
+                });
+
+            test('if no client token is provided', async() => {
+                await request(app)
+                    .delete(`${rootRoute}/`)
+                    .set('auth', '')
+                    .expect(async ({status, body}) => {
+                        expect(status).toBe(401);
+                        expect(body.message).toEqual("UnAuthorized")
+                        await expect(Client.countDocuments()).resolves.toBe(1);                        
+                        
+                    })
+            });
+            
+        })
+    })
 });
