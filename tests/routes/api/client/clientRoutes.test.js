@@ -154,4 +154,86 @@ describe(`${rootRoute}`, () => {
 
     });
 
+    describe('GET /:id', () => {
+        let clientObject;
+
+        
+        describe('200:', () => {
+
+            test('should return the client for the provided id', async () => {
+                clientObject = randomClient();
+                const {_id} = await Client.create(clientObject);
+                clientObject._id = _id.toHexString();
+
+                await request(app)
+                .get(`${rootRoute}/${clientObject._id}`)
+                .expect(({body, status}) => {
+                    expect(status).toBe(200);
+                    const {client} = body;
+                    expect(client._id).toEqual(clientObject._id);
+                    expect(client.name).toEqual(clientObject.name);
+                    expect(client.phone).toEqual(clientObject.phone);
+                    expect(Array.isArray(client.address)).toBe(true);
+                    expect(client.address).toHaveLength(0);
+                    expect(client).toHaveProperty('pic');
+                    expect(client).toHaveProperty('points', 0);
+                    expect(client).toHaveProperty('rating', -1);
+                    expect(client).toHaveProperty('createdAt');
+                });
+                
+            });          
+
+            test('should return the client for the provided id with address', async () => {
+                clientObject = randomClient();
+                clientObject.address = randomAddress();
+                const {_id} = await Client.create(clientObject);
+                clientObject._id = _id.toHexString();
+
+
+                await request(app)
+                .get(`${rootRoute}/${clientObject._id}`)
+                .expect(({body, status}) => {
+                    expect(status).toBe(200);
+                    const {client} = body;
+                    expect(client._id).toEqual(clientObject._id);
+                    expect(client.name).toEqual(clientObject.name);
+                    expect(client.phone).toEqual(clientObject.phone);
+                    expect(Array.isArray(client.address)).toBe(true);
+                    expect(client.address).toHaveLength(1);
+                    expect(client).toHaveProperty('pic');
+                    expect(client).toHaveProperty('points', 0);
+                    expect(client).toHaveProperty('rating', -1);
+                    expect(client).toHaveProperty('createdAt');
+                });
+            });
+        });
+
+        describe('404:', () => {
+            test('if client doesn\'t exist', async () => {
+                const randomId = mongoose.Types.ObjectId();
+                await request(app)
+                .get(`${rootRoute}/${randomId}`)
+                .expect(({body, status}) => {
+                    expect(status).toBe(404);
+                    const {client, message} = body;
+                    expect(client).toBeNull();
+                    expect(message).toEqual("Client not found");
+                });
+            });
+        });
+
+        describe('400:', () => {
+            test('if client doesn\'t exist', async () => {
+                const invalidId = 13518;
+                await request(app)
+                .get(`${rootRoute}/${invalidId}`)
+                .expect(({body, status}) => {
+                    expect(status).toBe(400);
+                    expect(body.errors._id).toEqual("invalid object id");
+                });
+            });
+        });
+
     });
+
+});
